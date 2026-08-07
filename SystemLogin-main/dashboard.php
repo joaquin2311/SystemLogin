@@ -1,17 +1,28 @@
 <?php
 session_start();
 
+// Enforce Login Authorization
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("Location: index.php");
     exit();
 }
+
+// Session Timeout Handling (15 Minutes)
+$timeout_duration = 900;
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+    session_unset();
+    session_destroy();
+    header("Location: index.php");
+    exit();
+}
+$_SESSION['last_activity'] = time();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberStation - Admin Dashboard</title>
+    <title>CyberStation Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -112,12 +123,12 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
         .stat-card h6 { color: #94a3b8; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
         .stat-card h2 { font-size: 32px; font-weight: 700; margin-top: 10px; margin-bottom: 0; }
 
-        /* PC Station Grid */
+        /* Floor Plan PC Grid */
         .pc-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         .pc-card {
             background: #1e293b;
@@ -125,7 +136,6 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
             padding: 15px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            position: relative;
         }
         .pc-card.occupied { border-color: #ef4444; }
         .pc-card.available { border-color: #22c55e; }
@@ -140,7 +150,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
         .status-occupied { background: rgba(239, 68, 68, 0.2); color: #f87171; }
         .status-available { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
 
-        /* Right Panel Feed */
+        /* Right Side Activity Panel */
         .right-panel {
             width: 320px;
             background: #111827;
@@ -232,7 +242,6 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
             </div>
         </div>
 
-        <!-- Live Station Grid -->
         <h5 class="fw-bold mb-3"><i class="bi bi-cpu me-2"></i>Live Floor Plan</h5>
         <div class="pc-grid">
             <div class="pc-card occupied">
