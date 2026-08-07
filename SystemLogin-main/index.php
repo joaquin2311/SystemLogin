@@ -24,12 +24,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password_input = trim($_POST["password"]);
 
     if (!empty($user_input) && !empty($password_input)) {
-        $sql = "SELECT id, username, password
-        FROM users
-        WHERE username = ?";
+        $sql = "SELECT id, username, password FROM users WHERE username = ? OR email = ?";
 
         if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, "s", $user_input);
+            mysqli_stmt_bind_param($stmt, "ss", $user_input, $user_input);
 
             if (mysqli_stmt_execute($stmt)) {
                 mysqli_stmt_store_result($stmt);
@@ -204,5 +202,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="db.js"></script>
 </body>
 </html>
