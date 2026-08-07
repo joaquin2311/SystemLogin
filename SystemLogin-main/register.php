@@ -7,7 +7,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST["username"]);
     $account_type = $_POST["account_type"];
     
-    // Process registration logic here
     $success = "Account successfully registered! You can now log in.";
 }
 ?>
@@ -31,29 +30,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .register-card {
             background: #111827;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 16px;
             padding: 35px;
             width: 100%;
             max-width: 460px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
         }
+
+        .card-subtext { color: #cbd5e1 !important; font-size: 14px; }
+        .form-label-custom {
+            color: #94a3b8 !important;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
         .form-control, .form-select {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #f8fafc;
+            background: #1e293b !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
             border-radius: 10px;
             padding: 12px;
         }
-        .form-control:focus, .form-select:focus {
-            background: #1e293b;
-            color: #fff;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
-        }
+        .form-control::placeholder { color: #64748b !important; opacity: 1; }
+        
         .btn-cyber {
             background: #6366f1;
-            color: #fff;
+            color: #ffffff;
             border: none;
             padding: 12px;
             border-radius: 10px;
@@ -61,7 +65,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 100%;
             transition: all 0.2s;
         }
-        .btn-cyber:hover { background: #4f46e5; }
+        .btn-cyber:hover { background: #4f46e5; color: #fff; }
+        
+        .link-bright { color: #38bdf8 !important; font-weight: 600; text-decoration: none; }
+        .link-bright:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -71,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="fs-2 text-primary fw-bold mb-1">
             <i class="bi bi-controller"></i> CyberStation
         </div>
-        <p class="text-muted">Create a Member / Staff Account</p>
+        <p class="card-subtext">Create a Member / Staff Account</p>
     </div>
 
     <?php if($success): ?>
@@ -80,12 +87,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <form method="POST" action="">
         <div class="mb-3">
-            <label class="form-label text-muted small fw-semibold">USERNAME</label>
+            <label class="form-label form-label-custom mb-1">USERNAME</label>
             <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
         </div>
         
         <div class="mb-3">
-            <label class="form-label text-muted small fw-semibold">MEMBERSHIP TIER</label>
+            <label class="form-label form-label-custom mb-1">MEMBERSHIP TIER</label>
             <select name="account_type" class="form-select">
                 <option value="Standard">Regular Member ($2/hr)</option>
                 <option value="VIP">VIP Gamer Tier ($3.5/hr)</option>
@@ -93,17 +100,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </select>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label text-muted small fw-semibold">PASSWORD</label>
+        <div class="mb-4">
+            <label class="form-label form-label-custom mb-1">PASSWORD</label>
             <input type="password" name="password" class="form-control" placeholder="Create password" required>
         </div>
 
-        <button type="submit" class="btn-cyber mt-2">Create Account</button>
+        <button type="submit" class="btn-cyber">Create Account</button>
     </form>
 
     <div class="mt-4 text-center fs-6">
-        <span class="text-muted">Already registered?</span> 
-        <a href="index.php" class="text-primary text-decoration-none fw-semibold">Sign In</a>
+        <span style="color: #94a3b8;">Already registered?</span> 
+        <a href="index.php" class="link-bright ms-1">Sign In</a>
     </div>
 </div>
 

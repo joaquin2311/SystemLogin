@@ -6,7 +6,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST["username"]);
     $password = trim($_POST["password"]);
 
-    // Example logic (Replace with MySQL auth query)
     if (!empty($username) && !empty($password)) {
         $_SESSION["loggedin"] = true;
         $_SESSION["username"] = $username;
@@ -37,29 +36,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .login-card {
             background: #111827;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 16px;
             padding: 35px;
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
         }
+        
+        /* High-contrast labels and text */
+        .card-subtext {
+            color: #cbd5e1 !important; /* Lighter subtext */
+            font-size: 14px;
+        }
+        .form-label-custom {
+            color: #94a3b8 !important; /* Bright silver label text */
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Input styling with bright text and clear placeholders */
         .form-control {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #f8fafc;
+            background: #1e293b !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
             border-radius: 10px;
             padding: 12px;
         }
-        .form-control:focus {
-            background: #1e293b;
-            color: #fff;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+        .form-control::placeholder {
+            color: #64748b !important; /* Visible light-grey placeholder */
+            opacity: 1;
         }
+        .form-control:focus {
+            border-color: #818cf8 !important;
+            box-shadow: 0 0 0 0.25rem rgba(129, 140, 248, 0.25);
+        }
+
+        /* Action Buttons & Links */
         .btn-cyber {
             background: #6366f1;
-            color: #fff;
+            color: #ffffff;
             border: none;
             padding: 12px;
             border-radius: 10px;
@@ -67,16 +84,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 100%;
             transition: all 0.2s;
         }
-        .btn-cyber:hover { background: #4f46e5; }
+        .btn-cyber:hover { background: #4f46e5; color: #fff; }
+        
+        .link-bright {
+            color: #38bdf8 !important; /* Bright sky blue for readability */
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .link-bright:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
 <div class="login-card text-center">
-    <div class="fs-2 text-primary fw-bold mb-2">
+    <div class="fs-2 text-primary fw-bold mb-1">
         <i class="bi bi-controller"></i> CyberStation
     </div>
-    <p class="text-muted mb-4">Enter account details to unlock station access</p>
+    <p class="card-subtext mb-4">Enter account details to unlock station access</p>
 
     <?php if($error): ?>
         <div class="alert alert-danger py-2 text-start" style="font-size: 14px;"><?php echo $error; ?></div>
@@ -84,19 +108,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <form method="POST" action="">
         <div class="mb-3 text-start">
-            <label class="form-label text-muted small fw-semibold">USERNAME OR CUSTOMER ID</label>
+            <label class="form-label form-label-custom mb-1">USERNAME OR CUSTOMER ID</label>
             <input type="text" name="username" class="form-control" placeholder="e.g. admin or customer1" required>
         </div>
         <div class="mb-4 text-start">
-            <label class="form-label text-muted small fw-semibold">PASSWORD / PIN</label>
+            <label class="form-label form-label-custom mb-1">PASSWORD / PIN</label>
             <input type="password" name="password" class="form-control" placeholder="••••••••" required>
         </div>
         <button type="submit" class="btn-cyber">Start Session / Login</button>
     </form>
 
     <div class="mt-4 fs-6">
-        <span class="text-muted">Need a new account?</span> 
-        <a href="register.php" class="text-primary text-decoration-none fw-semibold">Create Member Account</a>
+        <span style="color: #94a3b8;">Need a new account?</span> 
+        <a href="register.php" class="link-bright ms-1">Create Member Account</a>
     </div>
 </div>
 
