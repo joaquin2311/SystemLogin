@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("Location: index.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,7 +27,6 @@ session_start();
             color: #333;
         }
 
-        /* Sidebar Navigation */
         .sidebar {
             width: 250px;
             background: rgba(255, 255, 255, 0.15);
@@ -71,9 +74,13 @@ session_start();
             border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
+            transition: background 0.2s ease-in-out;
         }
 
-        /* Main Content Container */
+        .logout-btn:hover {
+            background: #e63939;
+        }
+
         .main-content {
             flex: 1;
             padding: 40px;
@@ -87,6 +94,15 @@ session_start();
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-card h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header-card p {
+            color: #666;
         }
 
         .stats-grid {
@@ -107,6 +123,8 @@ session_start();
             font-size: 14px;
             color: #666;
             margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .stat-card p {
@@ -118,12 +136,11 @@ session_start();
 </head>
 <body>
 
-    <!-- Sidebar -->
     <div class="sidebar">
         <div>
             <h2>🔒 System Admin</h2>
             <ul class="nav-links">
-                <li><a href="#" class="active">Dashboard</a></li>
+                <li><a href="dashboard.php" class="active">Dashboard</a></li>
                 <li><a href="#">Users</a></li>
                 <li><a href="#">Settings</a></li>
             </ul>
@@ -131,24 +148,23 @@ session_start();
         <a href="logout.php" class="logout-btn">Logout</a>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
         <div class="header-card">
-            <h1>Welcome Back, Admin!</h1>
+            <h1>Welcome back, <?php echo htmlspecialchars($_SESSION["username"]); ?>!</h1>
             <p>Here is an overview of your system's current status.</p>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>TOTAL USERS</h3>
+                <h3>Total Users</h3>
                 <p>1,248</p>
             </div>
             <div class="stat-card">
-                <h3>ACTIVE SESSIONS</h3>
+                <h3>Active Sessions</h3>
                 <p>42</p>
             </div>
             <div class="stat-card">
-                <h3>SYSTEM STATUS</h3>
+                <h3>System Status</h3>
                 <p style="color: #28a745;">Online</p>
             </div>
         </div>

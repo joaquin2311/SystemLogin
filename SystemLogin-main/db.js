@@ -1,4 +1,3 @@
-// Include SweetAlert2 dynamically if not already added in HTML
 if (!document.getElementById('sweetalert-script')) {
     const script = document.createElement('script');
     script.id = 'sweetalert-script';
@@ -14,7 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
         loginForm.addEventListener("submit", function (e) {
             const password = passwordInput.value;
 
-            // Password Requirements regex checks
             const minLength = password.length >= 8;
             const hasUpper = /[A-Z]/.test(password);
             const hasLower = /[a-z]/.test(password);
@@ -22,9 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
             if (!minLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
-                e.preventDefault(); // Stop form submission
+                e.preventDefault(); 
 
-                // Styled popup instead of standard black browser alert
                 Swal.fire({
                     icon: 'warning',
                     title: 'Invalid Password Format',

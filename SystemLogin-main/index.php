@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password);
 
                     if (mysqli_stmt_fetch($stmt)) {
-                        if (password_verify($password_input, $hashed_password) || $password_input === $hashed_password) {
+                        if (password_verify($password_input, $hashed_password)) {
                             
                             $_SESSION["loggedin"] = true;
                             $_SESSION["user_id"] = $id;
@@ -44,6 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             if (isset($_POST["remember"])) {
                                 setcookie("user_login", $username, time() + (86400 * 30), "/"); // 30 days
+                            } else {
+                                setcookie("user_login", "", time() - 3600, "/");
                             }
 
                             header("Location: dashboard.php");
@@ -191,7 +193,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </button>
 
         <div class="text-center mt-3">
-            <a href="#" class="text-decoration-none">Forgot Password?</a>
+            <a href="forgot-password.php" class="text-decoration-none">Forgot Password?</a>
+            <span class="mx-1">•</span>
+            <a href="register.php" class="text-decoration-none">Create Account</a>
         </div>
 
     </form>
@@ -202,6 +206,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="db.js"></script>
 </body>
 </html>
