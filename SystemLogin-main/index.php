@@ -115,12 +115,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: #fff !important;
             border-radius: 10px;
             padding: 12px;
+            transition: all 0.3s ease;
         }
         .form-control::placeholder { color: #a1a1aa; }
         .form-control:focus {
             background: rgba(255, 255, 255, 0.12);
             border-color: #818cf8;
-            box-shadow: 0 0 10px rgba(129, 140, 248, 0.3);
+            box-shadow: 0 0 12px rgba(129, 140, 248, 0.5);
+        }
+        .input-group-text {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: none;
+            color: #a5b4fc;
+            cursor: pointer;
+            border-radius: 0 10px 10px 0;
+        }
+        .password-field {
+            border-right: none;
+            border-radius: 10px 0 0 10px;
         }
         .btn-custom {
             background: linear-gradient(135deg, #6366f1, #a855f7);
@@ -147,16 +160,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="logo">🔒</div>
     <h3 class="text-center fw-bold mb-4">Welcome Back</h3>
 
-    <form action="index.php" method="POST">
+    <form id="loginForm" action="index.php" method="POST">
         <div class="mb-3">
             <label class="form-label text-sm text-light">Username or Email</label>
-            <input type="text" name="username" class="form-control" placeholder="Enter username or email" 
-                   value="<?php echo isset($_COOKIE['user_login']) ? htmlspecialchars($_COOKIE['user_login']) : ''; ?>" required>
+            <input type="text" id="usernameInput" name="username" class="form-control" placeholder="Enter username or email" 
+                   value="<?php echo isset($_COOKIE['user_login']) ? htmlspecialchars($_COOKIE['user_login']) : ''; ?>" required autocomplete="username">
         </div>
 
         <div class="mb-3">
             <label class="form-label text-sm text-light">Password</label>
-            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+            <div class="input-group">
+                <input type="password" id="passwordInput" name="password" class="form-control password-field" placeholder="••••••••" required autocomplete="current-password">
+                <span class="input-group-text" id="togglePasswordBtn">👁️</span>
+            </div>
         </div>
 
         <div class="form-check mb-4">
@@ -165,7 +181,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label class="form-check-label text-light" for="remember">Remember Me</label>
         </div>
 
-        <button type="submit" class="btn btn-custom mb-3">Sign In</button>
+        <button type="submit" id="submitBtn" class="btn btn-custom mb-3">Sign In</button>
 
         <div class="text-center text-sm">
             <a href="#">Forgot Password?</a>
@@ -174,6 +190,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const loginForm = document.getElementById("loginForm");
+        const passwordInput = document.getElementById("passwordInput");
+        const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+        const submitBtn = document.getElementById("submitBtn");
+
+        togglePasswordBtn.addEventListener("click", () => {
+            const isPassword = passwordInput.type === "password";
+            passwordInput.type = isPassword ? "text" : "password";
+            togglePasswordBtn.textContent = isPassword ? "🙈" : "👁️";
+        });
+
+        loginForm.addEventListener("submit", () => {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Signing in...
+            `;
+        });
+    });
+</script>
 
 <?php if (!empty($error)): ?>
 <script>

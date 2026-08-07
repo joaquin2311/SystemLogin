@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="register-card">
     <h3 class="text-center fw-bold mb-2">Create Account</h3>
-    <p class="text-center text-muted small mb-4">Join our platform today</p>
+    <p class="text-center text-light small mb-4" style="opacity: 0.9;">Join our platform today</p>
 
     <form action="register.php" method="POST">
         <div class="mb-3">
@@ -131,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit" class="btn btn-custom mb-3">Register</button>
 
         <div class="text-center text-sm">
-            <span class="text-muted">Already have an account?</span> <a href="index.php">Sign In</a>
+            <span class="text-light" style="opacity: 0.9;">Already have an account?</span> <a href="index.php">Sign In</a>
         </div>
     </form>
 </div>
