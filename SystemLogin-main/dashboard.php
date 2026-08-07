@@ -217,24 +217,24 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 
         <div class="feed-item">
             <div class="feed-user">
-                <div class="avatar">KD</div>
+                <div class="avatar">C</div>
                 <div>
-                    <div style="font-size: 13px; font-weight: 600;">Kd Rasec</div>
+                    <div style="font-size: 13px; font-weight: 600;">Cesar</div>
                     <div style="font-size: 11px; color: #94a3b8;">System Admin</div>
                 </div>
             </div>
-            <p style="font-size: 13px; color: #cbd5e1; margin: 0;">Updated security protocols and session tokens.</p>
+            <p style="font-size: 13px; color: #cbd5e1; margin: 0;">Updated backend routes and user authentication flows for the web platform.</p>
         </div>
 
         <div class="feed-item">
             <div class="feed-user">
-                <div class="avatar" style="background: #a855f7;">AA</div>
+                <div class="avatar" style="background: #a855f7;">A</div>
                 <div>
-                    <div style="font-size: 13px; font-weight: 600;">Aaron Abrico</div>
+                    <div style="font-size: 13px; font-weight: 600;">Aaron</div>
                     <div style="font-size: 11px; color: #94a3b8;">Moderator</div>
                 </div>
             </div>
-            <p style="font-size: 13px; color: #cbd5e1; margin: 0;">Verified 12 new user registration requests.</p>
+            <p style="font-size: 13px; color: #cbd5e1; margin: 0;">Reviewed and published initial UI layout changes for the main system dashboard.</p>
         </div>
     </div>
 
