@@ -8,55 +8,35 @@ $dbname = "login_system";
 
 $conn = mysqli_connect($host, $user, $password, $dbname);
 
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
 $error = "";
-$success = "";
+$success = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST["username"]);
     $email = trim($_POST["email"]);
     $password_input = $_POST["password"];
 
-    if (!empty($username) && !empty($email) && !empty($password_input)) {
-        
-        $uppercase = preg_match('@[A-Z]@', $password_input);
-        $lowercase = preg_match('@[a-z]@', $password_input);
-        $number    = preg_match('@[0-9]@', $password_input);
-        $special   = preg_match('@[^\w]@', $password_input);
+    $pattern = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/";
 
-        if (!$uppercase || !$lowercase || !$number || !$special || strlen($password_input) < 8) {
-            $error = "Password must meet all complexity requirements.";
-        } else {
-            $check_sql = "SELECT id FROM users WHERE username = ? OR email = ?";
-            if ($stmt = mysqli_prepare($conn, $check_sql)) {
-                mysqli_stmt_bind_param($stmt, "ss", $username, $email);
-                mysqli_stmt_execute($stmt);
-                mysqli_stmt_store_result($stmt);
-
-                if (mysqli_stmt_num_rows($stmt) > 0) {
-                    $error = "Username or Email already taken!";
-                } else {
-                    $hashed_password = password_hash($password_input, PASSWORD_DEFAULT);
-
-                    $insert_sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-                    if ($insert_stmt = mysqli_prepare($conn, $insert_sql)) {
-                        mysqli_stmt_bind_param($insert_stmt, "sss", $username, $email, $hashed_password);
-                        if (mysqli_stmt_execute($insert_stmt)) {
-                            $success = "Account created successfully! You can now log in.";
-                        } else {
-                            $error = "Something went wrong. Please try again.";
-                        }
-                        mysqli_stmt_close($insert_stmt);
-                    }
-                }
-                mysqli_stmt_close($stmt);
-            }
-        }
+    if (empty($username) || empty($email) || empty($password_input)) {
+        $error = "All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Invalid email format.";
+    } elseif (!preg_match($pattern, $password_input)) {
+        $error = "Password does not meet the safety requirements.";
     } else {
-        $error = "Please fill in all fields.";
+        $hashed_password = password_hash($password_input, PASSWORD_DEFAULT);
+
+        $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, "sss", $username, $email, $hashed_password);
+            if (mysqli_stmt_execute($stmt)) {
+                $success = true;
+            } else {
+                $error = "Username or Email already exists.";
+            }
+            mysqli_stmt_close($stmt);
+        }
     }
     mysqli_close($conn);
 }
@@ -67,130 +47,138 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account - System Login</title>
+    <title>Create Account</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #0d6efd, #6610f2);
-            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0;
         }
-
         .register-card {
-            width: 420px;
-            background: white;
-            padding: 35px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,.2);
-            margin: 20px 0;
+            width: 440px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            color: #fff;
         }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: #0d6efd;
-            color: white;
-            font-size: 35px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: auto;
+        .form-control {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff !important;
+            border-radius: 10px;
+            padding: 10px 14px;
         }
-
-        h2 {
-            text-align: center;
-            margin-top: 15px;
-            margin-bottom: 25px;
-        }
-
-        .btn-register {
+        .form-control::placeholder { color: #a1a1aa; }
+        .btn-custom {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 10px;
             width: 100%;
         }
+        .rules-list {
+            font-size: 13px;
+            list-style: none;
+            padding-left: 0;
+            margin-top: 8px;
+        }
+        .rules-list li { color: #f87171; transition: color 0.2s; }
+        .rules-list li.valid { color: #4ade80; }
+        a { color: #a5b4fc; text-decoration: none; }
     </style>
 </head>
 <body>
 
 <div class="register-card">
-    <div class="logo">👤</div>
-    <h2>Create Account</h2>
+    <h3 class="text-center fw-bold mb-2">Create Account</h3>
+    <p class="text-center text-muted small mb-4">Join our platform today</p>
 
-    <?php if (!empty($error)): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <?php echo htmlspecialchars($error); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
-
-    <?php if (!empty($success)): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <?php echo htmlspecialchars($success); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
-
-    <form id="registerForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+    <form action="register.php" method="POST">
         <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username" required>
+            <label class="form-label text-light">Username</label>
+            <input type="text" name="username" class="form-control" placeholder="johndoe" required>
         </div>
 
         <div class="mb-3">
-            <label for="email" class="form-label">Email Address</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email" required>
+            <label class="form-label text-light">Email Address</label>
+            <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
         </div>
 
         <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" required>
+            <label class="form-label text-light">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+            
+            <ul class="rules-list mt-2" id="rules">
+                <li id="len">✖ At least 8 characters</li>
+                <li id="upper">✖ At least 1 uppercase letter</li>
+                <li id="lower">✖ At least 1 lowercase letter</li>
+                <li id="num">✖ At least 1 number</li>
+                <li id="spec">✖ At least 1 special character (@$!%*?&)</li>
+            </ul>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-register">Register</button>
+        <button type="submit" class="btn btn-custom mb-3">Register</button>
 
-        <div class="text-center mt-3">
-            <a href="index.php" class="text-decoration-none">Already have an account? Login</a>
+        <div class="text-center text-sm">
+            <span class="text-muted">Already have an account?</span> <a href="index.php">Sign In</a>
         </div>
     </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-document.getElementById('registerForm').addEventListener('submit', function (e) {
-    const password = document.getElementById('password').value;
+    const passwordInput = document.getElementById('password');
+    const rules = {
+        len: { re: /.{8,}/, el: document.getElementById('len'), text: 'At least 8 characters' },
+        upper: { re: /[A-Z]/, el: document.getElementById('upper'), text: 'At least 1 uppercase letter' },
+        lower: { re: /[a-z]/, el: document.getElementById('lower'), text: 'At least 1 lowercase letter' },
+        num: { re: /\d/, el: document.getElementById('num'), text: 'At least 1 number' },
+        spec: { re: /[@$!%*?&]/, el: document.getElementById('spec'), text: 'At least 1 special character (@$!%*?&)' }
+    };
 
-    const minLength = password.length >= 8;
-    const hasUpper = /[A-Z]/.test(password);
-    const hasLower = /[a-z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    if (!minLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
-        e.preventDefault();
-        Swal.fire({
-            icon: 'warning',
-            title: 'Invalid Password Format',
-            html: `
-                <div style="text-align: left; font-size: 14px; line-height: 1.6;">
-                    <strong>Password must contain:</strong><br>
-                    • At least 8 characters<br>
-                    • At least 1 uppercase letter<br>
-                    • At least 1 lowercase letter<br>
-                    • At least 1 number<br>
-                    • At least 1 special character
-                </div>
-            `,
-            confirmButtonColor: '#0d6efd',
-            confirmButtonText: 'OK'
-        });
-    }
-});
+    passwordInput.addEventListener('input', () => {
+        const val = passwordInput.value;
+        for (let key in rules) {
+            const isValid = rules[key].re.test(val);
+            rules[key].el.classList.toggle('valid', isValid);
+            rules[key].el.textContent = (isValid ? '✔ ' : '✖ ') + rules[key].text;
+        }
+    });
 </script>
+
+<?php if ($success): ?>
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Account Created!',
+        text: 'You can now sign in with your credentials.',
+        background: '#1e1b4b',
+        color: '#fff',
+        confirmButtonColor: '#6366f1'
+    }).then(() => { window.location.href = 'index.php'; });
+</script>
+<?php elseif (!empty($error)): ?>
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Registration Error',
+        text: '<?php echo $error; ?>',
+        background: '#1e1b4b',
+        color: '#fff',
+        confirmButtonColor: '#6366f1'
+    });
+</script>
+<?php endif; ?>
+
 </body>
 </html>

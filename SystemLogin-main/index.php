@@ -37,13 +37,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     if (mysqli_stmt_fetch($stmt)) {
                         if (password_verify($password_input, $hashed_password)) {
-                            
                             $_SESSION["loggedin"] = true;
                             $_SESSION["user_id"] = $id;
                             $_SESSION["username"] = $username;
 
                             if (isset($_POST["remember"])) {
-                                setcookie("user_login", $username, time() + (86400 * 30), "/"); // 30 days
+                                setcookie("user_login", $username, time() + (86400 * 30), "/");
                             } else {
                                 setcookie("user_login", "", time() - 3600, "/");
                             }
@@ -51,22 +50,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             header("Location: dashboard.php");
                             exit();
                         } else {
-                            $error = "Invalid username/email or password!";
+                            $error = "Invalid credentials!";
                         }
                     }
                 } else {
-                    $error = "Invalid username/email or password!";
+                    $error = "Invalid credentials!";
                 }
             } else {
-                $error = "Something went wrong. Please try again later.";
+                $error = "Something went wrong. Please try again.";
             }
-
             mysqli_stmt_close($stmt);
         }
     } else {
-        $error = "Please enter both username/email and password.";
+        $error = "Please fill in all fields.";
     }
-
     mysqli_close($conn);
 }
 ?>
@@ -77,135 +74,119 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Login</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #0d6efd, #6610f2);
-            font-family: Arial, Helvetica, sans-serif;
-            height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0;
         }
-
         .login-card {
-            width: 400px;
-            background: white;
-            padding: 35px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,.2);
+            width: 420px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            color: #fff;
         }
-
         .logo {
-            width: 90px;
-            height: 90px;
-            background: #0d6efd;
-            color: white;
-            font-size: 40px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: auto;
+            font-size: 32px;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
         }
-
-        h2 {
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 30px;
+        .form-control {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff !important;
+            border-radius: 10px;
+            padding: 12px;
         }
-
-        .btn-login {
+        .form-control::placeholder { color: #a1a1aa; }
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #818cf8;
+            box-shadow: 0 0 10px rgba(129, 140, 248, 0.3);
+        }
+        .btn-custom {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 10px;
             width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #6c757d;
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
+            color: #fff;
         }
+        a { color: #a5b4fc; text-decoration: none; transition: color 0.2s; }
+        a:hover { color: #c7d2fe; }
     </style>
 </head>
-
 <body>
 
 <div class="login-card">
+    <div class="logo">🔒</div>
+    <h3 class="text-center fw-bold mb-4">Welcome Back</h3>
 
-    <div class="logo">
-        🔒
-    </div>
-
-    <h2>System Login</h2>
-
-    <?php if (!empty($error)): ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <?php echo htmlspecialchars($error); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
-
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
-
+    <form action="index.php" method="POST">
         <div class="mb-3">
-            <label for="username" class="form-label">Username or Email</label>
-            <input 
-                type="text" 
-                class="form-control" 
-                id="username" 
-                name="username" 
-                placeholder="Enter Username or Email" 
-                value="<?php echo isset($_COOKIE['user_login']) ? htmlspecialchars($_COOKIE['user_login']) : ''; ?>"
-                required 
-                autocomplete="username">
+            <label class="form-label text-sm text-light">Username or Email</label>
+            <input type="text" name="username" class="form-control" placeholder="Enter username or email" 
+                   value="<?php echo isset($_COOKIE['user_login']) ? htmlspecialchars($_COOKIE['user_login']) : ''; ?>" required>
         </div>
 
         <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input 
-                type="password" 
-                class="form-control" 
-                id="password" 
-                name="password" 
-                placeholder="Enter Password" 
-                required 
-                autocomplete="current-password">
+            <label class="form-label text-sm text-light">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
         </div>
 
-        <div class="form-check mb-3">
-            <input 
-                class="form-check-input" 
-                type="checkbox" 
-                id="remember" 
-                name="remember"
-                <?php echo isset($_COOKIE['user_login']) ? 'checked' : ''; ?>>
-            <label class="form-check-label" for="remember">
-                Remember Me
-            </label>
+        <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" name="remember" id="remember" 
+                   <?php echo isset($_COOKIE['user_login']) ? 'checked' : ''; ?>>
+            <label class="form-check-label text-light" for="remember">Remember Me</label>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-login">
-            Login
-        </button>
+        <button type="submit" class="btn btn-custom mb-3">Sign In</button>
 
-        <div class="text-center mt-3">
-            <a href="forgot-password.php" class="text-decoration-none">Forgot Password?</a>
-            <span class="mx-1">•</span>
-            <a href="register.php" class="text-decoration-none">Create Account</a>
+        <div class="text-center text-sm">
+            <a href="#">Forgot Password?</a>
+            <span class="mx-2 text-muted">•</span>
+            <a href="register.php">Create Account</a>
         </div>
-
     </form>
-
-    <div class="footer">
-    </div>
-
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="db.js"></script>
+<?php if (!empty($error)): ?>
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Authentication Failed',
+        text: '<?php echo $error; ?>',
+        background: '#1e1b4b',
+        color: '#fff',
+        confirmButtonColor: '#6366f1'
+    });
+</script>
+<?php endif; ?>
+
 </body>
 </html>
