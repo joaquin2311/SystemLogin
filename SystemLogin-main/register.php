@@ -9,7 +9,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
     $confirm_password = $_POST["confirm_password"];
 
-    // Password Guideline Verification
     $password_pattern = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/";
 
     if (empty($username) || empty($email) || empty($password)) {
@@ -19,10 +18,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!preg_match($password_pattern, $password)) {
         $error_msg = "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character (e.g., Hrm@2026!).";
     } else {
-        /* 
-           INSERT ACCOUNT INTO DATABASE HERE
-           $hashed_pass = password_hash($password, PASSWORD_BCRYPT);
-        */
         $success_msg = "Account created successfully! You can now log in.";
     }
 }

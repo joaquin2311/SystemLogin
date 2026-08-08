@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-// Enforce Login Authorization
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("Location: index.php");
     exit();
 }
 
-// Session Timeout Handling (15 Minutes)
 $timeout_duration = 900;
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
     session_unset();
@@ -36,7 +34,6 @@ $_SESSION['last_activity'] = time();
             overflow-x: hidden;
         }
 
-        /* Left Navigation Sidebar */
         .sidebar {
             width: 250px;
             background: #111827;
@@ -91,7 +88,6 @@ $_SESSION['last_activity'] = time();
         }
         .btn-logout:hover { background: #ef4444; color: #fff; }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             padding: 30px;
@@ -123,7 +119,6 @@ $_SESSION['last_activity'] = time();
         .stat-card h6 { color: #94a3b8; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
         .stat-card h2 { font-size: 32px; font-weight: 700; margin-top: 10px; margin-bottom: 0; }
 
-        /* Floor Plan PC Grid */
         .pc-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -150,7 +145,6 @@ $_SESSION['last_activity'] = time();
         .status-occupied { background: rgba(239, 68, 68, 0.2); color: #f87171; }
         .status-available { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
 
-        /* Right Side Activity Panel */
         .right-panel {
             width: 320px;
             background: #111827;
@@ -198,7 +192,6 @@ $_SESSION['last_activity'] = time();
 </head>
 <body>
 
-    <!-- Left Sidebar -->
     <div class="sidebar">
         <div>
             <div class="sidebar-brand">
@@ -214,7 +207,6 @@ $_SESSION['last_activity'] = time();
         <a href="logout.php" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
         <div class="welcome-card">
             <h2 class="fw-bold mb-0">CyberStation Management 👋</h2>
@@ -272,7 +264,6 @@ $_SESSION['last_activity'] = time();
         </div>
     </div>
 
-    <!-- Right Side Feed -->
     <div class="right-panel">
         <div class="panel-title">
             <span>Recent Activity</span>

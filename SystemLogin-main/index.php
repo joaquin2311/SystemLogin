@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Session Management: Inactivity Timeout (15 minutes = 900 seconds)
 $timeout_duration = 900; 
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
     session_unset();
@@ -11,7 +10,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
 }
 $_SESSION['last_activity'] = time();
 
-// Initialize failed login attempts counter
 if (!isset($_SESSION['login_attempts'])) {
     $_SESSION['login_attempts'] = 0;
 }
@@ -19,13 +17,11 @@ if (!isset($_SESSION['login_attempts'])) {
 $error_msg = $error_msg ?? "";
 $max_attempts = 5;
 
-// Check if locked out
 if (isset($_SESSION['lockout_time']) && time() < $_SESSION['lockout_time']) {
     $remaining = ceil(($_SESSION['lockout_time'] - time()) / 60);
     $error_msg = "Your account has been locked due to multiple failed login attempts. Try again in {$remaining} min.";
 }
 
-// Handle Form Submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error_msg)) {
     $username = trim($_POST["username"]);
     $password = trim($_POST["password"]);
@@ -33,12 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error_msg)) {
     if (empty($username) || empty($password)) {
         $error_msg = "Please enter both username and password.";
     } else {
-        /*
-          REPLACE WITH YOUR DATABASE QUERY:
-          Check credentials using password_verify()
-        */
         $valid_user = "admin3";
-        $valid_pass = "Hrm@2026!"; // Example strong password
+        $valid_pass = "Hrm@2026!"; 
 
         if (($username === $valid_user || $username === "admin3@cyberstation.com") && $password === $valid_pass) {
             $_SESSION['login_attempts'] = 0;
@@ -52,10 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($error_msg)) {
             $_SESSION['login_attempts'] += 1;
             
             if ($_SESSION['login_attempts'] >= $max_attempts) {
-                $_SESSION['lockout_time'] = time() + (15 * 60); // 15-minute lock
+                $_SESSION['lockout_time'] = time() + (15 * 60); 
                 $error_msg = "Your account has been locked due to multiple failed login attempts.";
             } else {
-                // Security guideline: Generic error message
                 $error_msg = "Invalid username or password.";
             }
         }
