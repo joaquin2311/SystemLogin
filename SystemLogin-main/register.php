@@ -1,6 +1,9 @@
 <?php
 session_start();
-require_once 'config.php';
+
+if (file_exists('config.php')) {
+    require_once 'config.php';
+}
 
 $error = '';
 $success = '';
@@ -11,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     $confirm  = $_POST['confirm_password'];
 
-    if (!empty($username) && !empty($email) && !empty($password)) {
+    if (isset($pdo) && !empty($username) && !empty($email) && !empty($password)) {
         if ($password !== $confirm) {
             $error = "Passwords do not match.";
         } else {
@@ -19,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$email, $username]);
             
             if ($stmt->rowCount() > 0) {
-                $error = "Username or Email already taken.";
+                $error = "Username or Email is already taken.";
             } else {
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
@@ -31,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     } else {
-        $error = "Please fill in all fields.";
+        $error = isset($pdo) ? "Please fill in all fields." : "Database connection variable (\$pdo) not found in config.php.";
     }
 }
 ?>
@@ -43,18 +46,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Register | INTENSITY ZITE</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: #05070a; color: #a3adc2; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        body { background: #05070a; color: #a3adc2; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
 
         .reg-card { background: rgba(13, 16, 25, 0.95); border: 1px solid #1f2942; border-top: 3px solid #9d00ff; border-radius: 8px; padding: 40px; width: 440px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
         .reg-card h2 { color: #fff; font-size: 24px; font-weight: 900; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; }
         .reg-card p { font-size: 13px; color: #5a667d; margin-bottom: 24px; }
 
         .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 700; color: #6c7893; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; }
+        .form-group label { display: block; font-size: 10px; font-weight: 800; color: #6c7893; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1.5px; }
         .form-control { width: 100%; background: #080a10; border: 1px solid #1a2236; padding: 12px 14px; border-radius: 4px; color: #fff; font-size: 13px; outline: none; transition: 0.3s; }
-        .form-control:focus { border-color: #9d00ff; box-shadow: 0 0 8px rgba(157,0,255,0.4); }
+        .form-control:focus { border-color: #9d00ff; box-shadow: 0 0 10px rgba(157,0,255,0.4); }
 
-        .btn-glow { width: 100%; background: linear-gradient(135deg, #9d00ff, #00f3ff); color: #fff; padding: 12px; border-radius: 4px; font-weight: 800; text-transform: uppercase; font-size: 13px; border: none; cursor: pointer; letter-spacing: 1px; box-shadow: 0 0 15px rgba(157,0,255,0.3); margin-top: 10px; }
+        .btn-glow { width: 100%; background: linear-gradient(135deg, #9d00ff, #00f3ff); color: #fff; padding: 12px; border-radius: 4px; font-weight: 800; text-transform: uppercase; font-size: 12px; border: none; cursor: pointer; letter-spacing: 1.5px; box-shadow: 0 0 15px rgba(157,0,255,0.3); margin-top: 10px; transition: 0.3s; }
         .btn-glow:hover { box-shadow: 0 0 25px rgba(157,0,255,0.6); }
 
         .status-msg { font-size: 12px; padding: 10px; border-radius: 4px; margin-bottom: 16px; }

@@ -1,13 +1,17 @@
 <?php
 session_start();
-require_once 'config.php';
+
+// Safe config inclusion
+if (file_exists('config.php')) {
+    require_once 'config.php';
+}
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
 
-    if (!empty($email) && !empty($password)) {
+    if (isset($pdo) && !empty($email) && !empty($password)) {
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
@@ -21,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Invalid email or password.";
         }
     } else {
-        $error = "Please fill in all fields.";
+        $error = isset($pdo) ? "Please fill in all fields." : "Database connection variable (\$pdo) not found in config.php.";
     }
 }
 ?>
@@ -35,51 +39,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
         body { background: #05070a; color: #a3adc2; overflow-x: hidden; }
 
-        /* Tech Glow Accents */
-        .glow-cyan { text-shadow: 0 0 12px rgba(0, 243, 255, 0.6); color: #00f3ff; }
-        .glow-purple { text-shadow: 0 0 12px rgba(157, 0, 255, 0.6); color: #9d00ff; }
+        /* Neon Glow Utility Classes */
+        .glow-cyan { text-shadow: 0 0 15px rgba(0, 243, 255, 0.7); color: #00f3ff; }
+        .glow-purple { text-shadow: 0 0 15px rgba(157, 0, 255, 0.7); color: #9d00ff; }
 
-        /* Navigation Header */
-        header { background: rgba(10, 12, 18, 0.95); border-bottom: 1px solid #1a2035; padding: 0 40px; height: 70px; display: flex; justify-content: space-between; align-items: center; position: fixed; top:0; width:100%; z-index:100; backdrop-filter: blur(10px); }
-        .brand-logo { font-size: 22px; font-weight: 900; letter-spacing: 1.5px; color: #fff; text-decoration: none; text-transform: uppercase; }
+        /* Header / Navbar */
+        header { background: rgba(10, 12, 18, 0.95); border-bottom: 1px solid #1a2035; padding: 0 40px; height: 70px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 100%; z-index: 100; backdrop-filter: blur(10px); }
+        .brand-logo { font-size: 22px; font-weight: 900; letter-spacing: 2px; color: #fff; text-decoration: none; text-transform: uppercase; }
         .brand-logo span { color: #00f3ff; }
         
         nav { display: flex; gap: 30px; }
-        nav a { color: #8e9bb0; text-decoration: none; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        nav a { color: #8e9bb0; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s; }
         nav a:hover { color: #00f3ff; }
 
         .auth-btns { display: flex; gap: 14px; align-items: center; }
-        .btn-glow { background: linear-gradient(135deg, #00f3ff, #9d00ff); color: #fff; padding: 10px 22px; border-radius: 4px; font-weight: 800; text-transform: uppercase; font-size: 12px; border: none; cursor: pointer; letter-spacing: 1px; box-shadow: 0 0 15px rgba(0,243,255,0.3); transition: 0.3s; text-decoration: none;}
+        .btn-glow { background: linear-gradient(135deg, #00f3ff, #9d00ff); color: #fff; padding: 10px 22px; border-radius: 4px; font-weight: 800; text-transform: uppercase; font-size: 11px; border: none; cursor: pointer; letter-spacing: 1.5px; box-shadow: 0 0 15px rgba(0,243,255,0.3); transition: 0.3s; text-decoration: none; display: inline-block; text-align: center; }
         .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(0,243,255,0.6); }
 
-        /* Hero Section */
-        .hero { height: 100vh; display: flex; align-items: center; justify-content: space-between; padding: 0 8%; background: radial-gradient(circle at 20% 50%, rgba(157,0,255,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(0,243,255,0.1) 0%, transparent 50%); }
+        /* Hero Container */
+        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: space-between; padding: 90px 8% 40px 8%; background: radial-gradient(circle at 15% 50%, rgba(157,0,255,0.18) 0%, transparent 50%), radial-gradient(circle at 85% 50%, rgba(0,243,255,0.12) 0%, transparent 50%); }
         .hero-text { max-width: 550px; }
-        .hero-text h1 { font-size: 54px; font-weight: 900; color: #fff; line-height: 1.1; text-transform: uppercase; margin-bottom: 16px; }
-        .hero-text p { font-size: 16px; line-height: 1.6; color: #6c7893; margin-bottom: 30px; }
+        .hero-text h1 { font-size: 52px; font-weight: 900; color: #fff; line-height: 1.1; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 1px; }
+        .hero-text p { font-size: 15px; line-height: 1.6; color: #6c7893; margin-bottom: 30px; }
 
         /* Login Card */
-        .login-card { background: rgba(13, 16, 25, 0.85); border: 1px solid #1f2942; border-top: 3px solid #00f3ff; border-radius: 8px; padding: 35px; width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-        .login-card h3 { color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 8px; text-transform: uppercase; }
-        .login-card p { font-size: 12px; margin-bottom: 24px; }
+        .login-card { background: rgba(13, 16, 25, 0.9); border: 1px solid #1f2942; border-top: 3px solid #00f3ff; border-radius: 8px; padding: 35px; width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        .login-card h3 { color: #fff; font-size: 22px; font-weight: 900; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .login-card p { font-size: 12px; margin-bottom: 24px; color: #5a667d; }
 
         .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 700; color: #6c7893; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; }
+        .form-group label { display: block; font-size: 10px; font-weight: 800; color: #6c7893; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1.5px; }
         .form-control { width: 100%; background: #080a10; border: 1px solid #1a2236; padding: 12px 14px; border-radius: 4px; color: #fff; font-size: 13px; outline: none; transition: 0.3s; }
-        .form-control:focus { border-color: #00f3ff; box-shadow: 0 0 8px rgba(0,243,255,0.3); }
+        .form-control:focus { border-color: #00f3ff; box-shadow: 0 0 10px rgba(0,243,255,0.3); }
 
         .error-msg { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 12px; padding: 10px; border-radius: 4px; margin-bottom: 16px; }
-        
-        /* Features / Esports Strip */
-        .esports-strip { background: #080a10; border-y: 1px solid #141a29; padding: 40px 8%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-        .feature-box { background: #0d1019; border: 1px solid #161d2e; padding: 25px; border-radius: 6px; }
-        .feature-box h4 { color: #fff; font-size: 16px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
+
+        /* Feature Section */
+        .esports-strip { background: #080a10; border-top: 1px solid #141a29; border-bottom: 1px solid #141a29; padding: 50px 8%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .feature-box { background: #0d1019; border: 1px solid #161d2e; padding: 28px; border-radius: 6px; }
+        .feature-box h4 { font-size: 16px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
+        .feature-box p { font-size: 13px; line-height: 1.5; color: #5a667d; }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="#" class="brand-logo">INTENSITY <span>ZITE</span></a>
+        <a href="index.php" class="brand-logo">INTENSITY <span>ZITE</span></a>
         <nav>
             <a href="#rates">Rates</a>
             <a href="#games">Games</a>
@@ -127,11 +132,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="feature-box">
             <h4 class="glow-purple">GIGABIT FIBER NETWORK</h4>
-            <p>Dedicated dual-line fiber connection ensuring single-digit ping across regional servers.</p>
+            <p>Dedicated dual-line fiber connection ensuring single-digit ping across regional gaming servers.</p>
         </div>
         <div class="feature-box">
-            <h4>OVERNIGHT PACKAGES</h4>
-            <p>Exclusive midnight power sessions with catered food delivery directly to your station.</p>
+            <h4 style="color: #fff;">OVERNIGHT PACKAGES</h4>
+            <p>Exclusive midnight power sessions with catered food delivery directly to your PC station.</p>
         </div>
     </section>
 
