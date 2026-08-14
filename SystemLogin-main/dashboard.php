@@ -12,99 +12,99 @@ if (!isset($_SESSION['username'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intensity Zite Internet Cafe | Admin Dashboard</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-        body { background: #08090c; color: #8f96ab; display: flex; height: 100vh; overflow: hidden; font-size: 18px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: #0c0d12; color: #7f8599; display: flex; height: 100vh; overflow: hidden; font-size: 13px; }
 
-        .sidebar { width: 100px; background: #0f1015; border-right: 1px solid #191b24; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 32px 0; flex-shrink: 0; }
-        .logo-icon { width: 60px; height: 60px; background: #5051f9; color: #fff; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 28px; text-decoration: none; }
-        .nav-icons { display: flex; flex-direction: column; gap: 32px; align-items: center; }
-        .nav-item { color: #4b5066; text-decoration: none; font-size: 28px; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 16px; }
-        .nav-item.active, .nav-item:hover { color: #5051f9; background: #171822; }
-        .bottom-nav { display: flex; flex-direction: column; gap: 28px; align-items: center; }
-        .logout-btn { color: #ef4444; text-decoration: none; font-size: 28px; }
+        .sidebar { width: 72px; background: #08090c; border-right: 1px solid #14161f; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0; flex-shrink: 0; }
+        .logo-icon { width: 38px; height: 38px; background: #ffffff; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; text-decoration: none; }
+        .nav-icons { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .nav-item { color: #434857; text-decoration: none; font-size: 18px; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; }
+        .nav-item.active, .nav-item:hover { color: #5850ec; background: #12131a; }
+        .bottom-nav { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+        .logout-btn { color: #ef4444; text-decoration: none; font-size: 18px; }
 
-        .wrapper { flex: 1; display: grid; grid-template-columns: 1fr 420px; grid-template-rows: 90px 1fr; height: 100vh; width: calc(100vw - 100px); }
+        .wrapper { flex: 1; display: grid; grid-template-columns: 1fr 340px; grid-template-rows: 64px 1fr; height: 100vh; width: calc(100vw - 72px); }
 
-        .top-nav { height: 90px; background: #0f1015; border-bottom: 1px solid #191b24; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; grid-column: span 2; }
-        .search-box { background: #151720; border: 1px solid #202330; padding: 16px 24px; border-radius: 12px; color: #fff; width: 420px; outline: none; font-size: 18px; }
-        .search-box::placeholder { color: #4b5066; }
-        .top-right { display: flex; align-items: center; gap: 32px; }
-        .mode-toggle { font-size: 16px; background: #151720; border: 1px solid #202330; padding: 12px 22px; border-radius: 12px; color: #9da3b4; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; }
-        .profile-section { display: flex; align-items: center; gap: 16px; }
-        .avatar { width: 52px; height: 52px; border-radius: 50%; background: #5051f9; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 22px; }
+        .top-nav { height: 64px; background: #0c0d12; border-bottom: 1px solid #14161f; display: flex; justify-content: space-between; align-items: center; padding: 0 28px; grid-column: span 2; }
+        .search-box { background: #12141c; border: 1px solid #1c1f2b; padding: 9px 16px; border-radius: 8px; color: #fff; width: 280px; outline: none; font-size: 13px; }
+        .search-box::placeholder { color: #434857; }
+        .top-right { display: flex; align-items: center; gap: 20px; }
+        .mode-toggle { font-size: 12px; background: #12141c; border: 1px solid #1c1f2b; padding: 7px 14px; border-radius: 8px; color: #8e95a8; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        .profile-section { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #5850ec; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; }
 
-        .content-area { padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 32px; }
+        .content-area { padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
         
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
-        .title-group { display: flex; align-items: center; gap: 18px; }
-        .title-group h2 { color: #fff; font-size: 36px; font-weight: 800; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+        .title-group { display: flex; align-items: center; gap: 14px; }
+        .title-group h2 { color: #fff; font-size: 20px; font-weight: 700; }
         .admin-avatars { display: flex; }
-        .admin-avatars span { width: 38px; height: 38px; border-radius: 50%; border: 3px solid #08090c; background: #373a4d; display: inline-block; margin-left: -12px; }
+        .admin-avatars span { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #0c0d12; background: #2a2d3d; display: inline-block; margin-left: -8px; }
 
-        .stats-summary { display: flex; gap: 28px; font-size: 17px; flex-wrap: wrap; }
-        .stat-item { color: #5a6075; font-weight: 600; }
-        .stat-item span { color: #fff; font-weight: 800; margin-left: 6px; }
+        .stats-summary { display: flex; gap: 18px; font-size: 12px; flex-wrap: wrap; }
+        .stat-item { color: #585e73; font-weight: 500; }
+        .stat-item span { color: #fff; font-weight: 700; margin-left: 4px; }
         .stat-item span.danger { color: #ef4444; }
 
         .filter-bar { display: flex; justify-content: space-between; align-items: center; }
-        .filter-group { display: flex; gap: 14px; }
-        .filter-select { background: #151720; border: 1px solid #202330; color: #9da3b4; padding: 14px 24px; border-radius: 12px; font-size: 17px; font-weight: 700; outline: none; }
-        .btn-book { background: #5051f9; color: white; border: none; padding: 14px 28px; border-radius: 12px; font-weight: 800; font-size: 17px; cursor: pointer; transition: 0.2s; }
-        .btn-book:hover { background: #4344d6; }
+        .filter-group { display: flex; gap: 10px; }
+        .filter-select { background: #12141c; border: 1px solid #1c1f2b; color: #8e95a8; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; }
+        .btn-book { background: #5850ec; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-book:hover { background: #473fdb; }
 
-        .pc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-        .pc-card { background: #111219; border: 1px solid #1c1e2b; border-radius: 16px; padding: 28px; min-height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
-        .pc-card.booked { background: #0b0c10; border-color: #151720; display: flex; align-items: center; justify-content: center; text-align: center; }
-        .pc-card.booked .booked-title { color: #4b5066; font-size: 24px; font-weight: 800; }
-        .pc-card.booked .booked-sub { color: #2e3245; font-size: 17px; margin-top: 6px; }
+        .pc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .pc-card { background: #12141c; border: 1px solid #1b1d28; border-radius: 10px; padding: 16px; min-height: 125px; display: flex; flex-direction: column; justify-content: space-between; }
+        .pc-card.booked { background: #0e0f15; border-color: #141620; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .pc-card.booked .booked-title { color: #434857; font-size: 16px; font-weight: 700; }
+        .pc-card.booked .booked-sub { color: #282b38; font-size: 12px; margin-top: 2px; }
 
         .pc-top { display: flex; justify-content: space-between; align-items: center; }
-        .pc-name { font-size: 15px; font-weight: 800; color: #5051f9; background: rgba(80, 81, 249, 0.15); padding: 6px 14px; border-radius: 8px; }
-        .pc-options { color: #4b5066; cursor: pointer; font-size: 22px; }
-        .pc-pkg { font-size: 22px; font-weight: 800; color: #fff; margin-top: 18px; }
-        .pc-user { margin-top: 18px; font-size: 18px; color: #9da3b4; font-weight: 700; }
-        .pc-meta { font-size: 15px; color: #4b5066; margin-top: 4px; }
+        .pc-name { font-size: 11px; font-weight: 700; color: #5850ec; background: rgba(88, 80, 236, 0.12); padding: 3px 8px; border-radius: 6px; }
+        .pc-options { color: #434857; cursor: pointer; font-size: 14px; }
+        .pc-pkg { font-size: 13px; font-weight: 700; color: #fff; margin-top: 10px; }
+        .pc-user { margin-top: 10px; font-size: 12px; color: #8e95a8; font-weight: 600; }
+        .pc-meta { font-size: 11px; color: #434857; margin-top: 2px; }
 
-        .speed-test-card { background: #111219; border: 1px solid #1c1e2b; border-radius: 16px; padding: 32px; }
-        .speed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
-        .speed-header strong { color: #fff; font-size: 22px; }
-        .speed-controls { display: flex; gap: 14px; }
-        .speed-graph { height: 80px; width: 100%; border-bottom: 1px dashed #202330; margin-bottom: 28px; position: relative; }
+        .speed-test-card { background: #12141c; border: 1px solid #1b1d28; border-radius: 10px; padding: 20px; }
+        .speed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .speed-header strong { color: #fff; font-size: 14px; }
+        .speed-controls { display: flex; gap: 10px; }
+        .speed-graph { height: 50px; width: 100%; border-bottom: 1px dashed #1c1f2b; margin-bottom: 16px; position: relative; }
         .speed-graph svg { width: 100%; height: 100%; overflow: visible; }
         
-        .speed-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; }
-        .metric-box { background: #0b0c10; padding: 20px; border-radius: 12px; border: 1px solid #171822; }
-        .metric-lbl { font-size: 13px; color: #4b5066; font-weight: 800; text-transform: uppercase; }
-        .metric-val { color: #fff; font-size: 22px; font-weight: 800; margin-top: 8px; }
+        .speed-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: center; }
+        .metric-box { background: #0e0f15; padding: 12px; border-radius: 8px; border: 1px solid #161822; }
+        .metric-lbl { font-size: 10px; color: #434857; font-weight: 700; text-transform: uppercase; }
+        .metric-val { color: #fff; font-size: 15px; font-weight: 700; margin-top: 4px; }
 
-        .right-bar { background: #0f1015; border-left: 1px solid #191b24; padding: 36px 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 32px; }
-        .right-title { color: #fff; font-size: 22px; font-weight: 800; margin-bottom: 18px; }
-        .admin-meta { font-size: 15px; background: #14151e; border: 1px solid #1f212e; padding: 22px; border-radius: 14px; display: flex; flex-direction: column; gap: 14px; }
+        .right-bar { background: #08090c; border-left: 1px solid #14161f; padding: 24px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+        .right-title { color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+        .admin-meta { font-size: 12px; background: #0e0f15; border: 1px solid #161822; padding: 14px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
         .admin-meta-row { display: flex; justify-content: space-between; }
-        .admin-meta-row span { color: #5a6075; font-weight: 600; }
-        .admin-meta-row strong { color: #fff; font-weight: 700; }
+        .admin-meta-row span { color: #585e73; }
+        .admin-meta-row strong { color: #fff; font-weight: 600; }
 
-        .tab-header { display: flex; gap: 28px; border-bottom: 1px solid #1a1c27; padding-bottom: 14px; font-size: 16px; font-weight: 800; }
-        .tab-item { cursor: pointer; color: #4b5066; }
-        .tab-item.active { color: #5051f9; border-bottom: 3px solid #5051f9; padding-bottom: 11px; }
+        .tab-header { display: flex; gap: 18px; border-bottom: 1px solid #161822; padding-bottom: 8px; font-size: 12px; font-weight: 600; }
+        .tab-item { cursor: pointer; color: #434857; }
+        .tab-item.active { color: #5850ec; border-bottom: 2px solid #5850ec; padding-bottom: 7px; }
 
-        .task-list { display: flex; flex-direction: column; gap: 24px; margin-top: 24px; }
-        .task-group { border-left: 4px solid #5051f9; padding-left: 16px; }
-        .task-title { color: #fff; font-size: 17px; font-weight: 800; }
-        .task-sub { font-size: 14px; color: #4b5066; margin-top: 4px; font-weight: 600; }
-        .task-sub span { color: #ef4444; font-weight: 800; }
-        .task-checklist { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; font-size: 16px; }
-        .check-item { display: flex; align-items: center; gap: 12px; color: #8f96ab; cursor: pointer; font-weight: 600; }
-        .check-item input[type="checkbox"] { accent-color: #5051f9; width: 20px; height: 20px; cursor: pointer; }
+        .task-list { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+        .task-group { border-left: 3px solid #5850ec; padding-left: 12px; }
+        .task-title { color: #fff; font-size: 13px; font-weight: 700; }
+        .task-sub { font-size: 11px; color: #434857; margin-top: 2px; }
+        .task-sub span { color: #ef4444; font-weight: 600; }
+        .task-checklist { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+        .check-item { display: flex; align-items: center; gap: 8px; color: #7f8599; cursor: pointer; }
+        .check-item input[type="checkbox"] { accent-color: #5850ec; width: 14px; height: 14px; cursor: pointer; }
 
-        .btn-add-task { background: #5051f9; color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 800; font-size: 16px; cursor: pointer; width: 100%; margin-top: auto; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-add-task:hover { background: #4344d6; }
+        .btn-add-task { background: #5850ec; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; width: 100%; margin-top: auto; transition: 0.2s; }
+        .btn-add-task:hover { background: #473fdb; }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <a href="#" class="logo-icon">I</a>
+        <a href="#" class="logo-icon">C</a>
         <nav class="nav-icons">
             <a href="#" class="nav-item active" title="Dashboard">⊞</a>
             <a href="#" class="nav-item" title="Analytics">📊</a>
@@ -125,8 +125,8 @@ if (!isset($_SESSION['username'])) {
                 <div class="profile-section">
                     <div class="avatar"><?php echo strtoupper(substr($_SESSION['username'], 0, 1)); ?></div>
                     <div>
-                        <strong style="color: #fff; display: block; font-size: 16px;"><?php echo htmlspecialchars($_SESSION['username']); ?></strong>
-                        <span style="color: #5a6075; font-size: 13px;">Intensity Zite Admin</span>
+                        <strong style="color: #fff; display: block; font-size: 13px;"><?php echo htmlspecialchars($_SESSION['username']); ?></strong>
+                        <span style="color: #434857; font-size: 11px;">First floor admin</span>
                     </div>
                 </div>
             </div>
@@ -137,7 +137,6 @@ if (!isset($_SESSION['username'])) {
                 <div class="title-group">
                     <h2>Admins</h2>
                     <div class="admin-avatars">
-                        <span></span>
                         <span></span>
                         <span></span>
                     </div>
@@ -153,7 +152,7 @@ if (!isset($_SESSION['username'])) {
 
             <div class="filter-bar">
                 <div class="filter-group">
-                    <select class="filter-select"><option>1st Floor</option></select>
+                    <select class="filter-select"><option>1st floor</option></select>
                     <select class="filter-select"><option>Sort</option></select>
                 </div>
                 <button class="btn-book">Book PC +</button>
@@ -168,7 +167,7 @@ if (!isset($_SESSION['username'])) {
                     <div class="pc-pkg">Midnight Package</div>
                     <div>
                         <div class="pc-user">Windah</div>
-                        <div class="pc-meta">Dota • 5hr 13min</div>
+                        <div class="pc-meta">Dota • 3hr 15min</div>
                     </div>
                 </div>
 
@@ -179,8 +178,8 @@ if (!isset($_SESSION['username'])) {
                     </div>
                     <div class="pc-pkg">Regular Package</div>
                     <div>
-                        <div class="pc-user">Suntis</div>
-                        <div class="pc-meta">Slot Gambling • 14hr 29min</div>
+                        <div class="pc-user">Sutris</div>
+                        <div class="pc-meta">Slot Gambling • 14hr 20min</div>
                     </div>
                 </div>
 
@@ -199,7 +198,14 @@ if (!isset($_SESSION['username'])) {
                     <div class="pc-pkg">Midnight Package</div>
                     <div>
                         <div class="pc-user">Topik</div>
-                        <div class="pc-meta">Stancer • 1hr 30min</div>
+                        <div class="pc-meta">Blender • 5hr 30min</div>
+                    </div>
+                </div>
+
+                <div class="pc-card booked">
+                    <div>
+                        <div class="booked-title">PC 4</div>
+                        <div class="booked-sub">Booked</div>
                     </div>
                 </div>
 
@@ -223,7 +229,19 @@ if (!isset($_SESSION['username'])) {
                     <div class="pc-pkg">Ten Hours Package</div>
                     <div>
                         <div class="pc-user">Jit Patel</div>
-                        <div class="pc-meta">Figma • 2hr 07min</div>
+                        <div class="pc-meta">Figma • 2hr 37min</div>
+                    </div>
+                </div>
+
+                <div class="pc-card">
+                    <div class="pc-top">
+                        <span class="pc-name">PC 8</span>
+                        <span class="pc-options">⋮</span>
+                    </div>
+                    <div class="pc-pkg">Twenty Hours Package</div>
+                    <div>
+                        <div class="pc-user">Dwiki</div>
+                        <div class="pc-meta">Twitch • 5hr 30min</div>
                     </div>
                 </div>
             </section>
@@ -239,19 +257,19 @@ if (!isset($_SESSION['username'])) {
 
                 <div class="speed-graph">
                     <svg preserveAspectRatio="none" viewBox="0 0 500 100">
-                        <path d="M0,50 Q125,20 250,60 T500,40" fill="none" stroke="#10b981" stroke-width="3"/>
-                        <path d="M0,70 Q125,40 250,80 T500,30" fill="none" stroke="#5051f9" stroke-width="3"/>
+                        <path d="M0,60 Q125,20 250,50 T500,40" fill="none" stroke="#22d3ee" stroke-width="2"/>
+                        <path d="M0,80 Q125,40 250,70 T500,30" fill="none" stroke="#5850ec" stroke-width="2"/>
                     </svg>
                 </div>
 
                 <div class="speed-metrics">
                     <div class="metric-box">
                         <div class="metric-lbl">Download</div>
-                        <div class="metric-val" style="color: #10b981;">102.38Mbps</div>
+                        <div class="metric-val" style="color: #22d3ee;">102.38Mbps</div>
                     </div>
                     <div class="metric-box">
                         <div class="metric-lbl">Upload</div>
-                        <div class="metric-val" style="color: #5051f9;">48.12Mbps</div>
+                        <div class="metric-val" style="color: #5850ec;">48.12Mbps</div>
                     </div>
                     <div class="metric-box">
                         <div class="metric-lbl">Ping</div>
@@ -259,7 +277,7 @@ if (!isset($_SESSION['username'])) {
                     </div>
                     <div class="metric-box">
                         <div class="metric-lbl">Connection</div>
-                        <div class="metric-val" style="font-size: 16px;">Telkom Server</div>
+                        <div class="metric-val" style="font-size: 12px;">Telkom Server</div>
                     </div>
                 </div>
             </section>
@@ -270,31 +288,31 @@ if (!isset($_SESSION['username'])) {
                 <div class="right-title">Admin & Maintenances</div>
                 <div class="admin-meta">
                     <div class="admin-meta-row"><span>Assigned:</span> <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></div>
-                    <div class="admin-meta-row"><span>Contract:</span> <strong>Aug 8, 2022 - Jan 9, 2025</strong></div>
+                    <div class="admin-meta-row"><span>Contract:</span> <strong>Aug 9, 2022 - Jan 9, 2025</strong></div>
                     <div class="admin-meta-row"><span>Status:</span> <strong style="color: #10b981;">Active</strong></div>
                 </div>
             </div>
 
             <div>
                 <div class="tab-header">
-                    <span class="tab-item active">Task 12</span>
+                    <span class="tab-item active">Task 10</span>
                     <span class="tab-item">Upcoming 5</span>
-                    <span class="tab-item">Files 11</span>
+                    <span class="tab-item">Files 10</span>
                 </div>
 
                 <div class="task-list">
                     <div class="task-group">
                         <div class="task-title">Monthly maintenances</div>
-                        <div class="task-sub">Aug 24, 2026 • <span>2 days remaining</span></div>
+                        <div class="task-sub">Aug 24, 2022 • <span>2 days remaining</span></div>
                         <div class="task-checklist">
                             <label class="check-item"><input type="checkbox" checked> Check for billing app</label>
-                            <label class="check-item"><input type="checkbox"> Check internet speed</label>
+                            <label class="check-item"><input type="checkbox" checked> Check internet speed</label>
                         </div>
                     </div>
 
                     <div class="task-group" style="border-color: #3b82f6;">
                         <div class="task-title">Upload the monthly reports</div>
-                        <div class="task-sub">Aug 21, 2026</div>
+                        <div class="task-sub">Aug 21, 2022</div>
                         <div class="task-checklist">
                             <label class="check-item"><input type="checkbox" checked> Revenue report</label>
                             <label class="check-item"><input type="checkbox"> Averages monthly active players</label>
@@ -303,10 +321,10 @@ if (!isset($_SESSION['username'])) {
 
                     <div class="task-group" style="border-color: #10b981;">
                         <div class="task-title">Equipment check</div>
-                        <div class="task-sub">Aug 21, 2026</div>
+                        <div class="task-sub">Aug 21, 2022</div>
                         <div class="task-checklist">
-                            <label class="check-item"><input type="checkbox"> Mouse</label>
-                            <label class="check-item"><input type="checkbox"> Keyboards</label>
+                            <label class="check-item"><input type="checkbox" checked> Mouse</label>
+                            <label class="check-item"><input type="checkbox" checked> Keyboards</label>
                         </div>
                     </div>
                 </div>
