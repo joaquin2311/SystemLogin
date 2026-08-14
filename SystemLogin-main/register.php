@@ -1,33 +1,37 @@
 <?php
 session_start();
-include 'config.php';
+require_once 'config.php';
 
 $error = '';
 $success = '';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST['username'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username']);
+    $email    = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm  = $_POST['confirm_password'];
 
     if (!empty($username) && !empty($email) && !empty($password)) {
-        if ($password !== $confirm_password) {
+        if ($password !== $confirm) {
             $error = "Passwords do not match.";
         } else {
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $username, $email, $hashed_password);
-
-            if ($stmt->execute()) {
-                $success = "Account created successfully!";
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? OR username = ?");
+            $stmt->execute([$email, $username]);
+            
+            if ($stmt->rowCount() > 0) {
+                $error = "Username or Email already taken.";
             } else {
-                $error = "Email or Username already exists.";
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+                if ($stmt->execute([$username, $email, $hashed_password])) {
+                    $success = "Account created! You can now log in.";
+                } else {
+                    $error = "System error during registration.";
+                }
             }
-            $stmt->close();
         }
     } else {
-        $error = "Please fill in all required fields.";
+        $error = "Please fill in all fields.";
     }
 }
 ?>
@@ -36,61 +40,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intensity Zite Internet Cafe | Register</title>
+    <title>Register | INTENSITY ZITE</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background: #08090c; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
-        .register-card { width: 100%; max-width: 520px; background: #0f1015; border: 1px solid #191b24; border-radius: 16px; padding: 45px 40px; box-shadow: 0 25px 60px rgba(0,0,0,0.6); }
-        .brand { text-align: center; font-size: 26px; font-weight: 800; color: #5051f9; margin-bottom: 8px; letter-spacing: 0.5px; }
-        .subtitle { text-align: center; color: #7f8599; font-size: 15px; margin-bottom: 32px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 12px; font-weight: 700; color: #5a6075; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.8px; }
-        .form-input { width: 100%; background: #151720; border: 1px solid #202330; padding: 15px; border-radius: 8px; color: #fff; font-size: 15px; outline: none; transition: 0.2s; }
-        .form-input:focus { border-color: #5051f9; }
-        .btn-register { width: 100%; background: #5051f9; color: #fff; border: none; padding: 16px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 10px; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-register:hover { background: #4344d6; }
-        .footer-text { text-align: center; font-size: 15px; color: #7f8599; margin-top: 26px; }
-        .footer-text a { color: #5051f9; text-decoration: none; font-weight: 700; }
-        .alert-error { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 14px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; text-align: center; }
-        .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; padding: 14px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; text-align: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background: #05070a; color: #a3adc2; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+        .reg-card { background: rgba(13, 16, 25, 0.95); border: 1px solid #1f2942; border-top: 3px solid #9d00ff; border-radius: 8px; padding: 40px; width: 440px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        .reg-card h2 { color: #fff; font-size: 24px; font-weight: 900; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; }
+        .reg-card p { font-size: 13px; color: #5a667d; margin-bottom: 24px; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 700; color: #6c7893; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; }
+        .form-control { width: 100%; background: #080a10; border: 1px solid #1a2236; padding: 12px 14px; border-radius: 4px; color: #fff; font-size: 13px; outline: none; transition: 0.3s; }
+        .form-control:focus { border-color: #9d00ff; box-shadow: 0 0 8px rgba(157,0,255,0.4); }
+
+        .btn-glow { width: 100%; background: linear-gradient(135deg, #9d00ff, #00f3ff); color: #fff; padding: 12px; border-radius: 4px; font-weight: 800; text-transform: uppercase; font-size: 13px; border: none; cursor: pointer; letter-spacing: 1px; box-shadow: 0 0 15px rgba(157,0,255,0.3); margin-top: 10px; }
+        .btn-glow:hover { box-shadow: 0 0 25px rgba(157,0,255,0.6); }
+
+        .status-msg { font-size: 12px; padding: 10px; border-radius: 4px; margin-bottom: 16px; }
+        .error { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; }
+        .success { background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; }
+
+        .footer-link { text-align: center; font-size: 12px; margin-top: 20px; color: #5a667d; }
+        .footer-link a { color: #00f3ff; text-decoration: none; font-weight: 700; }
     </style>
 </head>
 <body>
 
-    <div class="register-card">
-        <div class="brand">Intensity Zite Internet Cafe</div>
-        <div class="subtitle">Register a new user or member account</div>
+    <div class="reg-card">
+        <h2>CREATE ACCOUNT</h2>
+        <p>Register to unlock VIP rates and tournament signups</p>
 
         <?php if (!empty($error)): ?>
-            <div class="alert-error"><?php echo htmlspecialchars($error); ?></div>
+            <div class="status-msg error"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
         <?php if (!empty($success)): ?>
-            <div class="alert-success"><?php echo htmlspecialchars($success); ?></div>
+            <div class="status-msg success"><?php echo htmlspecialchars($success); ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="register.php">
+        <form method="POST" action="">
             <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" class="form-input" required>
+                <label>Player Tag / Username</label>
+                <input type="text" name="username" class="form-control" required placeholder="GamerTag">
             </div>
             <div class="form-group">
                 <label>Email Address</label>
-                <input type="email" name="email" class="form-input" required>
+                <input type="email" name="email" class="form-control" required placeholder="player@domain.com">
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" class="form-input" required>
+                <input type="password" name="password" class="form-control" required placeholder="••••••••">
             </div>
             <div class="form-group">
                 <label>Confirm Password</label>
-                <input type="password" name="confirm_password" class="form-input" required>
+                <input type="password" name="confirm_password" class="form-control" required placeholder="••••••••">
             </div>
-            <button type="submit" class="btn-register">Create Account</button>
+            <button type="submit" class="btn-glow">REGISTER NOW</button>
         </form>
 
-        <div class="footer-text">
-            Already registered? <a href="index.php">Log In</a>
+        <div class="footer-link">
+            Already registered? <a href="index.php">Return to Log In</a>
         </div>
     </div>
 
