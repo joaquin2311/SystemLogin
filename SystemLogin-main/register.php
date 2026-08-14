@@ -12,13 +12,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($username) && !empty($email) && !empty($password)) {
         if (isset($pdo)) {
-            $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-            $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-            if ($stmt->execute([$username, $email, $hashed_password])) {
-                header("Location: index.php");
-                exit();
-            } else {
-                $message = "Registration failed. Try again.";
+            try {
+                // First logic block: Has TRY and correct BC_CRYPT hash
+                $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+                
+                if ($stmt->execute([$username, $email, $hashed_password])) {
+                    header("Location: index.php");
+                    exit();
+                } else {
+                    // Falls through here if SQL executed but failed, but try/catch handles main errors
+                    $message = "Registration failed. Try again.";
+                }
+            } catch (PDOException $e) {
+                // First logic block: Gracious handling of duplicates
+                // Code 23000 is for unique constraint violations
+                if ($e->getCode() == 23000) {
+                    $message = "Username or Email is already taken. Please choose another.";
+                } else {
+                    // Fallback to second block's error handling style
+                    $message = "Registration failed: An unexpected error occurred.";
+                }
             }
         }
     } else {
@@ -45,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Register to unlock station bookings and tournament passes.</p>
 
             <?php if (!empty($message)): ?>
-                <p style="color: #ff4d4d; font-size: 13px;"><?php echo htmlspecialchars($message); ?></p>
+                <p style="color: #ff4d4d; font-size: 13px; text-align: center; margin-bottom: 10px;"><?php echo htmlspecialchars($message); ?></p>
             <?php endif; ?>
 
             <form method="POST" action="register.php">
