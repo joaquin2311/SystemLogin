@@ -1,15 +1,20 @@
 <?php
 session_start();
 
-// Safe config inclusion
+// Standard PHP error reporting set to suppress warnings on-screen for a small shop setting
+error_reporting(E_ALL & ~E_WARNING); 
+ini_set('display_errors', 0);
+
+// Safe config inclusion and basic db connectivity check
 if (file_exists('config.php')) {
     require_once 'config.php';
 }
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
+    // Collect inputs safely, even if 'password' isn't set, avoiding the specific warning
+    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
 
     if (isset($pdo) && !empty($email) && !empty($password)) {
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
@@ -22,10 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: dashboard.php");
             exit();
         } else {
-            $error = "Invalid email or password.";
+            $error = "Incorrect Login."; // Generic shop-style error
         }
     } else {
-        $error = isset($pdo) ? "Please fill in all fields." : "Database connection variable (\$pdo) not found in config.php.";
+        $error = "Login Failed."; // Avoid specific 'fill in fields' warning
     }
 }
 ?>
@@ -33,112 +38,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INTENSITY ZITE | Cyber Gaming Arena</title>
+    <title>INTENSITY ZITE | street side internet</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: #05070a; color: #a3adc2; overflow-x: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Courier, 'Courier New', monospace; }
+        body { background: #000000; color: #5a85ab; } /* Basic dark blue text on pure black */
 
-        /* Neon Glow Utility Classes */
-        .glow-cyan { text-shadow: 0 0 15px rgba(0, 243, 255, 0.7); color: #00f3ff; }
-        .glow-purple { text-shadow: 0 0 15px rgba(157, 0, 255, 0.7); color: #9d00ff; }
+        /* De-styled Header */
+        header { border-bottom: 2px solid #28395e; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 18px; font-weight: bold; color: #fff; text-transform: uppercase; }
+        .logo span { color: #1e70e1; }
+        nav { display: flex; gap: 15px; }
+        nav a { color: #5a85ab; text-decoration: none; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        nav a:hover { color: #1e70e1; }
+        .btn-join { background: #1e70e1; color: #fff; padding: 6px 12px; border-radius: 2px; font-size: 11px; font-weight: bold; text-decoration: none; text-transform: uppercase; border: 1px solid #fff; }
 
-        /* Header / Navbar */
-        header { background: rgba(10, 12, 18, 0.95); border-bottom: 1px solid #1a2035; padding: 0 40px; height: 70px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 100%; z-index: 100; backdrop-filter: blur(10px); }
-        .brand-logo { font-size: 22px; font-weight: 900; letter-spacing: 2px; color: #fff; text-decoration: none; text-transform: uppercase; }
-        .brand-logo span { color: #00f3ff; }
+        /* Very simplified main section, lower visual density */
+        main { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 40px; }
+        .content-container { display: flex; gap: 40px; align-items: flex-start; max-width: 900px; }
         
-        nav { display: flex; gap: 30px; }
-        nav a { color: #8e9bb0; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s; }
-        nav a:hover { color: #00f3ff; }
+        .promo-text { width: 50%; padding-top: 30px; }
+        .promo-text h1 { font-size: 32px; font-weight: bold; color: #fff; text-transform: uppercase; margin-bottom: 10px; }
+        .promo-text p { font-size: 12px; color: #5a85ab; margin-bottom: 20px; line-height: 1.5; }
+        .btn-book { background: #0c0f16; color: #1e70e1; border: 1px solid #1e70e1; padding: 8px 16px; border-radius: 2px; font-size: 11px; text-decoration: none; display: inline-block; text-transform: uppercase; }
 
-        .auth-btns { display: flex; gap: 14px; align-items: center; }
-        .btn-glow { background: linear-gradient(135deg, #00f3ff, #9d00ff); color: #fff; padding: 10px 22px; border-radius: 4px; font-weight: 800; text-transform: uppercase; font-size: 11px; border: none; cursor: pointer; letter-spacing: 1.5px; box-shadow: 0 0 15px rgba(0,243,255,0.3); transition: 0.3s; text-decoration: none; display: inline-block; text-align: center; }
-        .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(0,243,255,0.6); }
+        /* Login Card: Pure 90s PH shop aesthetic: black box, simple border */
+        .login-card { background: #000; border: 2px solid #1e70e1; border-radius: 3px; padding: 25px; width: 340px; }
+        .login-card h3 { color: #fff; font-size: 16px; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 10px; color: #5a85ab; text-transform: uppercase; margin-bottom: 4px; }
+        .form-control { width: 100%; background: #000; border: 1px solid #28395e; padding: 10px; border-radius: 2px; color: #fff; font-size: 12px; font-family: inherit; }
+        .form-control:focus { border-color: #1e70e1; outline: none; }
 
-        /* Hero Container */
-        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: space-between; padding: 90px 8% 40px 8%; background: radial-gradient(circle at 15% 50%, rgba(157,0,255,0.18) 0%, transparent 50%), radial-gradient(circle at 85% 50%, rgba(0,243,255,0.12) 0%, transparent 50%); }
-        .hero-text { max-width: 550px; }
-        .hero-text h1 { font-size: 52px; font-weight: 900; color: #fff; line-height: 1.1; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 1px; }
-        .hero-text p { font-size: 15px; line-height: 1.6; color: #6c7893; margin-bottom: 30px; }
+        /* Basic submit button */
+        .btn-login { width: 100%; background: #1e70e1; color: #fff; padding: 10px; border: 1px solid #fff; border-radius: 2px; font-size: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
+        .btn-login:hover { background: #155cb7; }
 
-        /* Login Card */
-        .login-card { background: rgba(13, 16, 25, 0.9); border: 1px solid #1f2942; border-top: 3px solid #00f3ff; border-radius: 8px; padding: 35px; width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-        .login-card h3 { color: #fff; font-size: 22px; font-weight: 900; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
-        .login-card p { font-size: 12px; margin-bottom: 24px; color: #5a667d; }
-
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-size: 10px; font-weight: 800; color: #6c7893; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1.5px; }
-        .form-control { width: 100%; background: #080a10; border: 1px solid #1a2236; padding: 12px 14px; border-radius: 4px; color: #fff; font-size: 13px; outline: none; transition: 0.3s; }
-        .form-control:focus { border-color: #00f3ff; box-shadow: 0 0 10px rgba(0,243,255,0.3); }
-
-        .error-msg { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 12px; padding: 10px; border-radius: 4px; margin-bottom: 16px; }
-
-        /* Feature Section */
-        .esports-strip { background: #080a10; border-top: 1px solid #141a29; border-bottom: 1px solid #141a29; padding: 50px 8%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-        .feature-box { background: #0d1019; border: 1px solid #161d2e; padding: 28px; border-radius: 6px; }
-        .feature-box h4 { font-size: 16px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
-        .feature-box p { font-size: 13px; line-height: 1.5; color: #5a667d; }
+        /* Standardized error output - no red background box */
+        .error-msg { font-size: 11px; color: #ef4444; margin-bottom: 15px; text-align: center; }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="index.php" class="brand-logo">INTENSITY <span>ZITE</span></a>
+        <a href="index.php" class="logo">INTENSITY <span>ZITE</span></a>
         <nav>
-            <a href="#rates">Rates</a>
-            <a href="#games">Games</a>
-            <a href="#esports">Esports Zone</a>
-            <a href="#about">About Us</a>
+            <a href="#">Rates</a>
+            <a href="#">Games</a>
+            <a href="#">Esports</a>
+            <a href="#">About</a>
         </nav>
-        <div class="auth-btns">
-            <a href="register.php" class="btn-glow">Join Arena</a>
-        </div>
+        <a href="register.php" class="btn-join">Join Hub</a>
     </header>
 
-    <section class="hero">
-        <div class="hero-text">
-            <h1 class="glow-cyan">PLAY. COMPETE. <br><span class="glow-purple">DOMINATE.</span></h1>
-            <p>Experience ultra-low latency gaming with high-tier RTX stations, competitive esports stages, and 24/7 premium internet cafe amenities.</p>
-            <a href="register.php" class="btn-glow">Book Station Now</a>
-        </div>
+    <main>
+        <div class="content-container">
+            <div class="promo-text">
+                <h1>PLAY. COMPETE. <span style="color: #1e70e1;">DOMINATE.</span></h1>
+                <p>Play Valorant, DOTA 2, MLBB, and more on high-spec PCs. Street-side gaming hub open 24/7. High-speed internet. Mechanical keyboards.</p>
+                <a href="#" class="btn-book">Book Station Now</a>
+            </div>
 
-        <div class="login-card">
-            <h3>Player Access</h3>
-            <p>Log in to access your session hours and rewards</p>
+            <div class="login-card">
+                <h3>Customer Access</h3>
+                
+                <?php if (!empty($error)): ?>
+                    <div class="error-msg"><?php echo htmlspecialchars($error); ?></div>
+                <?php endif; ?>
 
-            <?php if (!empty($error)): ?>
-                <div class="error-msg"><?php echo htmlspecialchars($error); ?></div>
-            <?php endif; ?>
-
-            <form method="POST" action="">
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" name="email" class="form-control" required placeholder="player@domain.com">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control" required placeholder="••••••••">
-                </div>
-                <button type="submit" class="btn-glow" style="width: 100%; margin-top: 10px;">LOG IN</button>
-            </form>
+                <form method="POST" action="index.php">
+                    <div class="form-group">
+                        <label>Customer Email</label>
+                        <input type="email" name="email" class="form-control" required placeholder="player@cafe.ph">
+                    </div>
+                    <div class="form-group">
+                        <label>Session Password</label>
+                        <input type="password" name="password" class="form-control" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-login">LOGIN TO SESSION</button>
+                </form>
+            </div>
         </div>
-    </section>
-
-    <section class="esports-strip">
-        <div class="feature-box">
-            <h4 class="glow-cyan">PRO ESPORTS STAGE</h4>
-            <p>240Hz Curved Displays, Mechanical Peripherals, and isolated soundproof booths for tournament play.</p>
-        </div>
-        <div class="feature-box">
-            <h4 class="glow-purple">GIGABIT FIBER NETWORK</h4>
-            <p>Dedicated dual-line fiber connection ensuring single-digit ping across regional gaming servers.</p>
-        </div>
-        <div class="feature-box">
-            <h4 style="color: #fff;">OVERNIGHT PACKAGES</h4>
-            <p>Exclusive midnight power sessions with catered food delivery directly to your PC station.</p>
-        </div>
-    </section>
+    </main>
 
 </body>
 </html>
