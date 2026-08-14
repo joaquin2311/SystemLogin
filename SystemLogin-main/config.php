@@ -1,12 +1,16 @@
 <?php
-define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
-define('DB_NAME', 'login_db');
+$host     = 'localhost';
+$dbname   = 'systemlogin'; // Change this to your actual database name if different
+$username = 'root';        // Default XAMPP MySQL username
+$password = '';            // Default XAMPP MySQL password (empty)
 
-$conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password, [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ]);
+} catch (PDOException $e) {
+    die("Database Connection Failed: " . $e->getMessage());
 }
 ?>
