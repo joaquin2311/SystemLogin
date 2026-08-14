@@ -1,295 +1,212 @@
 <?php
 session_start();
-
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-    header("Location: index.php");
-    exit();
+if (!isset($_SESSION['username'])) { 
+    $_SESSION['username'] = 'Prapto'; 
 }
-
-$timeout_duration = 900;
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
-    session_unset();
-    session_destroy();
-    header("Location: index.php");
-    exit();
-}
-$_SESSION['last_activity'] = time();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberStation Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>CyberStation | Advanced Monitoring Dashboard</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body {
-            display: flex;
-            min-height: 100vh;
-            background: #0b0f19;
-            color: #f8fafc;
-            margin: 0;
-            overflow-x: hidden;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background: #0b0c10; color: #c5c6c7; display: flex; height: 100vh; overflow: hidden; }
 
-        .sidebar {
-            width: 250px;
-            background: #111827;
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 25px 18px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100vh;
-            position: sticky;
-            top: 0;
-        }
-        .sidebar-brand {
-            font-size: 20px;
-            font-weight: 700;
-            color: #6366f1;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 35px;
-        }
-        .nav-link-custom {
-            color: #94a3b8;
-            padding: 12px 16px;
-            border-radius: 10px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        .nav-link-custom:hover, .nav-link-custom.active {
-            background: rgba(99, 102, 241, 0.15);
-            color: #818cf8;
-        }
-        .btn-logout {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.25);
-            border-radius: 10px;
-            padding: 11px;
-            text-align: center;
-            text-decoration: none;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-        .btn-logout:hover { background: #ef4444; color: #fff; }
+        .sidebar { width: 70px; background: #12131a; border-right: 1px solid #1f2029; display: flex; flex-direction: column; align-items: center; padding: 20px 0; justify-content: space-between; }
+        .logo-icon { width: 40px; height: 40px; background: #ffffff; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; text-decoration: none; }
+        .nav-icons { display: flex; flex-direction: column; gap: 25px; }
+        .nav-item { color: #66687a; text-decoration: none; font-size: 20px; transition: 0.2s; }
+        .nav-item.active, .nav-item:hover { color: #6366f1; }
+        .logout-icon { color: #ef4444; text-decoration: none; font-size: 20px; }
 
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            height: 100vh;
-            overflow-y: auto;
-        }
-        .welcome-card {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 25px;
-        }
-        .welcome-subtext {
-            color: #f1f5f9 !important; 
-            font-size: 15px;
-            margin-top: 6px;
-            margin-bottom: 0;
-            opacity: 0.95;
-        }
+        .top-nav { height: 60px; background: #12131a; border-bottom: 1px solid #1f2029; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; grid-column: span 2; }
+        .search-box { background: #1a1b26; border: 1px solid #2a2b3d; padding: 8px 16px; border-radius: 8px; color: #fff; width: 300px; outline: none; }
+        .profile-section { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
 
-        .stat-card {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 22px;
-            text-align: center;
-        }
-        .stat-card h6 { color: #94a3b8; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
-        .stat-card h2 { font-size: 32px; font-weight: 700; margin-top: 10px; margin-bottom: 0; }
+        .wrapper { flex: 1; display: grid; grid-template-columns: 1fr 340px; grid-template-rows: 60px 1fr; height: 100vh; }
+        .content-area { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
 
-        .pc-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .pc-card {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .pc-card.occupied { border-color: #ef4444; }
-        .pc-card.available { border-color: #22c55e; }
-        .pc-card.vip { border-color: #a855f7; }
-        .pc-status-badge {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-        .status-occupied { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-        .status-available { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .floor-plan-card { background: #12131a; border: 1px solid #1f2029; border-radius: 12px; padding: 20px; position: relative; min-height: 380px; display: flex; flex-direction: column; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-title { color: #ffffff; font-size: 1.1rem; font-weight: 600; }
+        
+        .iso-map-container { flex: 1; background: #181924; border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid #232533; }
+        .iso-grid { width: 80%; height: 80%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; transform: rotateX(55deg) rotateZ(-30deg); transform-style: preserve-3d; perspective: 1000px; }
+        .iso-node { background: #232533; border: 1px solid #3b3e54; border-radius: 6px; padding: 10px; color: white; text-align: center; font-size: 12px; transform: translateZ(10px); box-shadow: -5px 5px 15px rgba(0,0,0,0.5); }
+        .iso-node.active { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
+        .iso-node.alert { border-color: #ef4444; background: rgba(239, 68, 68, 0.15); }
+        .node-tag { font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: bold; text-transform: uppercase; margin-top: 4px; display: inline-block; }
+        .tag-active { background: #10b981; color: #000; }
+        .tag-alert { background: #ef4444; color: #fff; }
 
-        .right-panel {
-            width: 320px;
-            background: #111827;
-            border-left: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 25px 20px;
-            height: 100vh;
-            overflow-y: auto;
-            position: sticky;
-            top: 0;
-        }
-        .panel-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #f8fafc;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .feed-item {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .feed-user {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-        .avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: #6366f1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .sub-card { background: #12131a; border: 1px solid #1f2029; border-radius: 12px; padding: 18px; }
+        
+        .activity-list { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+        .activity-item { display: flex; justify-content: space-between; align-items: center; background: #181924; padding: 10px 14px; border-radius: 8px; font-size: 13px; }
+        .activity-item small { color: #66687a; }
+
+        .telemetry-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #1f2029; }
+        .telemetry-row:last-child { border-bottom: none; }
+        .status-pill { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .pill-live { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+
+        .right-bar { background: #12131a; border-left: 1px solid #1f2029; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .task-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .task-item { background: #181924; border: 1px solid #232533; padding: 12px; border-radius: 8px; font-size: 12px; }
+        .task-title { color: #fff; font-weight: 600; margin-bottom: 4px; }
+        .task-date { color: #66687a; font-size: 11px; margin-bottom: 8px; }
+        .btn-add-task { background: #6366f1; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: auto; }
+        .btn-add-task:hover { background: #4f46e5; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div>
-            <div class="sidebar-brand">
-                <i class="bi bi-controller"></i> CyberStation
-            </div>
-            <nav>
-                <a href="dashboard.php" class="nav-link-custom active"><i class="bi bi-pc-display"></i> Stations</a>
-                <a href="#" class="nav-link-custom"><i class="bi bi-people-fill"></i> Customers</a>
-                <a href="#" class="nav-link-custom"><i class="bi bi-clock-history"></i> Session Logs</a>
-                <a href="#" class="nav-link-custom"><i class="bi bi-gear-fill"></i> System Config</a>
-            </nav>
+        <a href="#" class="logo-icon">CC</a>
+        <div class="nav-icons">
+            <a href="#" class="nav-item active">⊞</a>
+            <a href="#" class="nav-item">🖥</a>
+            <a href="#" class="nav-item">👥</a>
+            <a href="#" class="nav-item">⚙</a>
         </div>
-        <a href="logout.php" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        <a href="logout.php" class="logout-icon" title="Logout">⏻</a>
     </div>
 
-    <div class="main-content">
-        <div class="welcome-card">
-            <h2 class="fw-bold mb-0">CyberStation Management 👋</h2>
-            <p class="welcome-subtext">Logged in as: <strong><?php echo htmlspecialchars($_SESSION["username"]); ?></strong> | Live network status.</p>
-        </div>
-
-        <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <h6>Active Computers</h6>
-                    <h2 style="color: #818cf8;">28 / 40</h2>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <h6>Available Stations</h6>
-                    <h2 style="color: #38bdf8;">12</h2>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <h6>Server Status</h6>
-                    <h2 style="color: #4ade80;">Online</h2>
-                </div>
-            </div>
-        </div>
-
-        <h5 class="fw-bold mb-3"><i class="bi bi-cpu me-2"></i>Live Floor Plan</h5>
-        <div class="pc-grid">
-            <div class="pc-card occupied">
-                <i class="bi bi-pc-display fs-3 text-danger"></i>
-                <div class="fw-bold mt-1">PC-01</div>
-                <span class="pc-status-badge status-occupied">Occupied</span>
-            </div>
-            <div class="pc-card occupied">
-                <i class="bi bi-pc-display fs-3 text-danger"></i>
-                <div class="fw-bold mt-1">PC-02</div>
-                <span class="pc-status-badge status-occupied">Occupied</span>
-            </div>
-            <div class="pc-card available">
-                <i class="bi bi-pc-display fs-3 text-success"></i>
-                <div class="fw-bold mt-1">PC-03</div>
-                <span class="pc-status-badge status-available">Ready</span>
-            </div>
-            <div class="pc-card occupied vip">
-                <i class="bi bi-controller fs-3 text-warning"></i>
-                <div class="fw-bold mt-1">VIP-01</div>
-                <span class="pc-status-badge status-occupied">VIP Active</span>
-            </div>
-            <div class="pc-card available">
-                <i class="bi bi-pc-display fs-3 text-success"></i>
-                <div class="fw-bold mt-1">PC-04</div>
-                <span class="pc-status-badge status-available">Ready</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="right-panel">
-        <div class="panel-title">
-            <span>Recent Activity</span>
-            <i class="bi bi-three-dots text-muted"></i>
-        </div>
-
-        <div class="feed-item">
-            <div class="feed-user">
-                <div class="avatar">C</div>
+    <div class="wrapper">
+        <div class="top-nav">
+            <input type="text" class="search-box" placeholder="Search terminals, logs, users...">
+            <div class="profile-section">
+                <div class="avatar"><?php echo strtoupper(substr($_SESSION['username'], 0, 1)); ?></div>
                 <div>
-                    <div style="font-size: 13px; font-weight: 600;">Cesar</div>
-                    <div style="font-size: 11px; color: #94a3b8;">System Admin</div>
+                    <strong style="color: #fff; font-size: 14px;"><?php echo htmlspecialchars($_SESSION['username']); ?></strong>
+                    <div style="font-size: 11px; color: #66687a;">First Floor Admin</div>
                 </div>
             </div>
-            <p style="font-size: 13px; color: #cbd5e1; margin: 0;">Added 3 hours pre-paid time to PC-02 session.</p>
         </div>
 
-        <div class="feed-item">
-            <div class="feed-user">
-                <div class="avatar" style="background: #a855f7;">A</div>
-                <div>
-                    <div style="font-size: 13px; font-weight: 600;">Aaron</div>
-                    <div style="font-size: 11px; color: #94a3b8;">Floor Staff</div>
+        <div class="content-area">
+            <div class="floor-plan-card">
+                <div class="card-header">
+                    <span class="card-title">Live Floor Plan</span>
+                    <span style="font-size: 12px; color: #10b981;">● Live Network View</span>
+                </div>
+                <div class="iso-map-container">
+                    <div class="iso-grid">
+                        <div class="iso-node active">
+                            <div>PC-01</div>
+                            <span class="node-tag tag-active">ACTIVE</span>
+                        </div>
+                        <div class="iso-node active">
+                            <div>PC-02</div>
+                            <span class="node-tag tag-active">ACTIVE</span>
+                        </div>
+                        <div class="iso-node alert">
+                            <div>PC-03</div>
+                            <span class="node-tag tag-alert">ALERT</span>
+                        </div>
+                        <div class="iso-node active">
+                            <div>PC-04</div>
+                            <span class="node-tag tag-active">ACTIVE</span>
+                        </div>
+                        <div class="iso-node alert">
+                            <div>VIP-01</div>
+                            <span class="node-tag tag-alert">ALERT</span>
+                        </div>
+                        <div class="iso-node active">
+                            <div>VIP-02</div>
+                            <span class="node-tag tag-active">ACTIVE</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <p style="font-size: 13px; color: #cbd5e1; margin: 0;">Unlocked VIP-01 station for tournament practice.</p>
+
+            <div class="data-grid">
+                <div class="sub-card">
+                    <span class="card-title">Recent Customer Activity</span>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div>
+                                <strong style="color:#fff;"><?php echo htmlspecialchars($_SESSION['username']); ?></strong> logged in
+                            </div>
+                            <small>3 mins ago</small>
+                        </div>
+                        <div class="activity-item">
+                            <div>
+                                <strong style="color:#fff;">Cesar</strong> extended PC-02 session
+                            </div>
+                            <small>1 hour ago</small>
+                        </div>
+                        <div class="activity-item">
+                            <div>
+                                <strong style="color:#fff;">Aaron</strong> unlocked VIP-01
+                            </div>
+                            <small>2 hours ago</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-card">
+                    <span class="card-title">Real-Time Server Status</span>
+                    <div style="margin-top: 10px;">
+                        <div class="telemetry-row">
+                            <span>Temperature</span>
+                            <strong style="color: #fff;">35 °C</strong>
+                        </div>
+                        <div class="telemetry-row">
+                            <span>Power Usage</span>
+                            <strong style="color: #fff;">220 W</strong>
+                        </div>
+                        <div class="telemetry-row">
+                            <span>Rack Status</span>
+                            <span class="status-pill pill-live">LIVE</span>
+                        </div>
+                        <div class="telemetry-row">
+                            <span>Server Latency</span>
+                            <strong style="color: #10b981;">5 ms avg</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-bar">
+            <div>
+                <span class="card-title">Admin & Maintenances</span>
+                <div style="margin-top: 10px; font-size: 12px;">
+                    <div>Assigned: <strong style="color:#fff;"><?php echo htmlspecialchars($_SESSION['username']); ?></strong></div>
+                    <div>Status: <span style="color:#10b981;">Active Session</span></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px;">
+                    <strong style="color:#fff;">Tasks</strong>
+                    <span style="color:#66687a;">Upcoming</span>
+                </div>
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-title">Monthly Maintenances</div>
+                        <div class="task-date">Aug 24, 2026 • 2 days remaining</div>
+                        <div style="color: #a5a6f6; font-size: 11px;">Check internet speeds & billing server</div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-title">Upload Monthly Reports</div>
+                        <div class="task-date">Aug 28, 2026</div>
+                        <div style="color: #a5a6f6; font-size: 11px;">Averages for monthly active members</div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-title">Equipment Check</div>
+                        <div class="task-date">Aug 30, 2026</div>
+                        <div style="color: #a5a6f6; font-size: 11px;">Check mechanical keyboards & headsets</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-add-task">+ Add New Task</button>
         </div>
     </div>
 
