@@ -37,51 +37,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>intensity zite internet cafe | Login</title>
+    <title>Intensity Zite Internet Cafe | Login</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background: #08090c; color: #fff; min-height: 100vh; display: flex; flex-direction: column; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 18px 40px; background: #0f1015; border-bottom: 1px solid #191b24; }
-        .header-left { display: flex; align-items: center; gap: 30px; }
-        .logo { font-weight: 800; font-size: 18px; color: #5051f9; text-decoration: none; display: flex; align-items: center; gap: 8px; text-transform: lowercase; }
-        .nav-links { display: flex; gap: 20px; list-style: none; }
-        .nav-links a { color: #7f8599; text-decoration: none; font-size: 13px; font-weight: 700; text-transform: uppercase; transition: 0.2s; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 22px 50px; background: #0f1015; border-bottom: 1px solid #191b24; }
+        .header-left { display: flex; align-items: center; gap: 40px; }
+        .logo { font-weight: 800; font-size: 22px; color: #5051f9; text-decoration: none; letter-spacing: 0.5px; }
+        .nav-links { display: flex; gap: 28px; list-style: none; }
+        .nav-links a { color: #7f8599; text-decoration: none; font-size: 14px; font-weight: 700; text-transform: uppercase; transition: 0.2s; letter-spacing: 0.5px; }
         .nav-links a:hover { color: #5051f9; }
-        .header-right { display: flex; align-items: center; gap: 20px; font-size: 13px; font-weight: 600; color: #7f8599; }
-        .btn-signup-nav { border: 1px solid #202330; padding: 6px 16px; border-radius: 6px; color: #fff; text-decoration: none; font-size: 11px; font-weight: 700; background: #151720; }
-        .btn-signup-nav:hover { border-color: #5051f9; color: #fff; }
-        .main-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
-        .login-card-wrapper { width: 100%; max-width: 900px; background: #0f1015; border-radius: 12px; border: 1px solid #191b24; display: flex; overflow: hidden; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); }
-        .welcome-side { flex: 1.2; padding: 60px 50px; display: flex; flex-direction: column; justify-content: center; background: #0b0c10; }
-        .welcome-side h1 { font-size: 32px; font-weight: 700; margin-bottom: 15px; color: #fff; }
-        .welcome-side p { color: #7f8599; font-size: 14px; margin-bottom: 8px; }
-        .welcome-side a { color: #5051f9; font-weight: 700; text-decoration: underline; }
-        .form-side { flex: 1; background: #111219; padding: 40px 35px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid #191b24; }
-        .btn-facebook { background: #3b5998; color: #fff; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 1px; cursor: pointer; margin-bottom: 20px; text-transform: uppercase; }
-        .divider { text-align: center; position: relative; margin-bottom: 20px; }
+        .header-right { display: flex; align-items: center; gap: 24px; font-size: 14px; font-weight: 600; color: #7f8599; }
+        .btn-signup-nav { border: 1px solid #202330; padding: 10px 22px; border-radius: 8px; color: #fff; text-decoration: none; font-size: 13px; font-weight: 700; background: #151720; transition: 0.2s; }
+        .btn-signup-nav:hover { border-color: #5051f9; background: #5051f9; }
+        .main-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 50px 20px; }
+        .login-card-wrapper { width: 100%; max-width: 1050px; background: #0f1015; border-radius: 16px; border: 1px solid #191b24; display: flex; overflow: hidden; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); min-height: 520px; }
+        .welcome-side { flex: 1.2; padding: 70px 60px; display: flex; flex-direction: column; justify-content: center; background: #0b0c10; }
+        .welcome-side h1 { font-size: 42px; font-weight: 800; margin-bottom: 18px; color: #fff; line-height: 1.2; }
+        .welcome-side p { color: #7f8599; font-size: 16px; margin-bottom: 12px; }
+        .welcome-side a { color: #5051f9; font-weight: 700; text-decoration: underline; font-size: 16px; }
+        .form-side { flex: 1; background: #111219; padding: 50px 45px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid #191b24; }
+        .btn-facebook { background: #3b5998; color: #fff; border: none; width: 100%; padding: 15px; border-radius: 8px; font-size: 13px; font-weight: 700; letter-spacing: 1px; cursor: pointer; margin-bottom: 24px; text-transform: uppercase; transition: 0.2s; }
+        .btn-facebook:hover { background: #30487b; }
+        .divider { text-align: center; position: relative; margin-bottom: 24px; }
         .divider::before { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: #1f212e; }
-        .divider span { position: relative; background: #111219; padding: 0 10px; color: #434759; font-size: 11px; font-weight: 700; }
-        .form-title { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #7f8599; margin-bottom: 20px; text-transform: uppercase; }
-        .form-group { margin-bottom: 15px; }
-        .form-input { width: 100%; background: #151720; border: 1px solid #202330; padding: 12px 14px; border-radius: 6px; color: #fff; font-size: 13px; outline: none; }
+        .divider span { position: relative; background: #111219; padding: 0 14px; color: #5a6075; font-size: 12px; font-weight: 700; }
+        .form-title { text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; color: #7f8599; margin-bottom: 24px; text-transform: uppercase; }
+        .form-group { margin-bottom: 18px; }
+        .form-input { width: 100%; background: #151720; border: 1px solid #202330; padding: 15px 16px; border-radius: 8px; color: #fff; font-size: 15px; outline: none; transition: 0.2s; }
         .form-input:focus { border-color: #5051f9; }
-        .forgot-link { display: block; color: #434759; font-size: 11px; text-decoration: none; margin: 5px 0 20px; }
+        .forgot-link { display: block; color: #5a6075; font-size: 13px; text-decoration: none; margin: 6px 0 24px; }
         .forgot-link:hover { color: #5051f9; }
-        .btn-login { background: #5051f9; color: #fff; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 1px; cursor: pointer; text-transform: uppercase; }
+        .btn-login { background: #5051f9; color: #fff; border: none; width: 100%; padding: 15px; border-radius: 8px; font-size: 13px; font-weight: 700; letter-spacing: 1px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
         .btn-login:hover { background: #4344d6; }
-        .error-msg { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 8px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 15px; text-align: center; }
+        .error-msg { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 18px; text-align: center; }
     </style>
 </head>
 <body>
 
     <header class="header">
         <div class="header-left">
-            <a href="index.php" class="logo">intensity zite internet cafe</a>
+            <a href="index.php" class="logo">Intensity Zite Internet Cafe</a>
             <ul class="nav-links">
+                <li><a href="#">Rates</a></li>
+                <li><a href="#">Games</a></li>
+                <li><a href="#">Status</a></li>
                 <li><a href="#">About Us</a></li>
-                <li><a href="#">FAQ</a></li>
-                <li><a href="#">Forums</a></li>
-                <li><a href="#">Blog</a></li>
             </ul>
         </div>
         <div class="header-right">
