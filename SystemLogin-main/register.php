@@ -1,31 +1,35 @@
 <?php
 session_start();
-require_once 'config.php';
+if (file_exists('config.php')) {
+    require_once 'config.php';
+}
 
 $message = '';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
-    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+    $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if (!empty($username) && !empty($email) && !empty($password)) {
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $message = "Please enter a valid email address.";
-        } else {
+        if (isset($pdo)) {
             try {
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+                $hashed_password = password_hash($password, PASSWORD_BCRYPT);
                 $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
                 
                 if ($stmt->execute([$username, $email, $hashed_password])) {
-                    $_SESSION['success_message'] = "Account created successfully! Please log in.";
                     header("Location: index.php");
                     exit();
+                } else {
+
+                    $message = "Registration failed. Try again.";
                 }
             } catch (PDOException $e) {
+
                 if ($e->getCode() == 23000) {
                     $message = "Username or Email is already taken. Please choose another.";
                 } else {
+
                     $message = "Registration failed: An unexpected error occurred.";
                 }
             }
@@ -45,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <header>
         <a href="index.php" class="logo">INTENSITY <span>ZITE</span></a>
+        <nav><a href="index.php">Return to Login</a></nav>
     </header>
 
     <main style="max-width: 450px; margin: 60px auto; padding: 0 20px;">
@@ -58,10 +63,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" action="register.php">
                 <label style="font-size: 12px; color: var(--text-muted);">Gamer Tag / Username</label>
-                <input type="text" name="username" class="form-control" required placeholder="GamerTag" value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
+                <input type="text" name="username" class="form-control" required placeholder="GamerTag">
 
                 <label style="font-size: 12px; color: var(--text-muted);">Email Address</label>
-                <input type="email" name="email" class="form-control" required placeholder="player@domain.com" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                <input type="email" name="email" class="form-control" required placeholder="player@domain.com">
 
                 <label style="font-size: 12px; color: var(--text-muted);">Password</label>
                 <input type="password" name="password" class="form-control" required placeholder="••••••••">

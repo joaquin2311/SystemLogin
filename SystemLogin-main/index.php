@@ -1,41 +1,29 @@
 <?php
 session_start();
+error_reporting(E_ALL & ~E_WARNING); 
+ini_set('display_errors', 0);
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-require_once 'config.php';
-
-$error = '';
-$success = '';
-
-if (isset($_SESSION['success_message'])) {
-    $success = $_SESSION['success_message'];
-    unset($_SESSION['success_message']);
+if (file_exists('config.php')) {
+    require_once 'config.php';
 }
 
+$error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
-    $password = $_POST['password'] ?? '';
+    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
 
-    if (!empty($email) && !empty($password)) {
-        if (isset($pdo)) {
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
+    if (isset($pdo) && !empty($email) && !empty($password)) {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
 
-            if ($user && password_verify($password, $user['password'])) {
-                session_regenerate_id(true);
-                
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                header("Location: dashboard.php");
-                exit();
-            } else {
-                $error = "Incorrect email or password submitted.";
-            }
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            header("Location: dashboard.php");
+            exit();
         } else {
-            $error = "Database connection error.";
+            $error = "Incorrect credentials submitted.";
         }
     } else {
         $error = "Please complete all required fields.";
@@ -53,6 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <header>
         <a href="index.php" class="logo">INTENSITY <span>ZITE</span></a>
+        <nav>
+            <a href="#">Rates</a>
+            <a href="#">Stations</a>
+            <a href="#">Tournaments</a>
+            <a href="register.php">Register Account</a>
+        </nav>
     </header>
 
     <main style="max-width: 1100px; margin: 80px auto; display: flex; gap: 60px; padding: 0 20px;">
@@ -68,17 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div style="width: 380px;" class="card-container">
             <h3>Player Portal Login</h3>
             
-            <?php if (!empty($success)): ?>
-                <p style="color: #4dff88; font-size: 13px; margin: 10px 0;"><?php echo htmlspecialchars($success); ?></p>
-            <?php endif; ?>
-
             <?php if (!empty($error)): ?>
                 <p style="color: #ff4d4d; font-size: 13px; margin: 10px 0;"><?php echo htmlspecialchars($error); ?></p>
             <?php endif; ?>
 
             <form method="POST" action="index.php">
                 <label style="font-size: 12px; color: var(--text-muted);">Email Address</label>
-                <input type="email" name="email" class="form-control" placeholder="player@domain.com" required value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                <input type="email" name="email" class="form-control" placeholder="player@domain.com" required>
 
                 <label style="font-size: 12px; color: var(--text-muted);">Password</label>
                 <input type="password" name="password" class="form-control" placeholder="••••••••" required>
