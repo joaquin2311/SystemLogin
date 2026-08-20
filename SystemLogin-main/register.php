@@ -1,36 +1,31 @@
 <?php
 session_start();
-if (file_exists('config.php')) {
-    require_once 'config.php';
-}
+require_once 'config.php';
 
 $message = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
-    $email = trim($_POST['email'] ?? '');
+    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
     $password = $_POST['password'] ?? '';
 
     if (!empty($username) && !empty($email) && !empty($password)) {
-        if (isset($pdo)) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $message = "Please enter a valid email address.";
+        } else {
             try {
-                // First logic block: Has TRY and correct BC_CRYPT hash
-                $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
                 
                 if ($stmt->execute([$username, $email, $hashed_password])) {
+                    $_SESSION['success_message'] = "Account created successfully! Please log in.";
                     header("Location: index.php");
                     exit();
-                } else {
-                    // Falls through here if SQL executed but failed, but try/catch handles main errors
-                    $message = "Registration failed. Try again.";
                 }
             } catch (PDOException $e) {
-                // First logic block: Gracious handling of duplicates
-                // Code 23000 is for unique constraint violations
                 if ($e->getCode() == 23000) {
                     $message = "Username or Email is already taken. Please choose another.";
                 } else {
-                    // Fallback to second block's error handling style
                     $message = "Registration failed: An unexpected error occurred.";
                 }
             }
@@ -50,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <header>
         <a href="index.php" class="logo">INTENSITY <span>ZITE</span></a>
-        <nav><a href="index.php">Return to Login</a></nav>
     </header>
 
     <main style="max-width: 450px; margin: 60px auto; padding: 0 20px;">
@@ -64,10 +58,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" action="register.php">
                 <label style="font-size: 12px; color: var(--text-muted);">Gamer Tag / Username</label>
-                <input type="text" name="username" class="form-control" required placeholder="GamerTag">
+                <input type="text" name="username" class="form-control" required placeholder="GamerTag" value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
 
                 <label style="font-size: 12px; color: var(--text-muted);">Email Address</label>
-                <input type="email" name="email" class="form-control" required placeholder="player@domain.com">
+                <input type="email" name="email" class="form-control" required placeholder="player@domain.com" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
 
                 <label style="font-size: 12px; color: var(--text-muted);">Password</label>
                 <input type="password" name="password" class="form-control" required placeholder="••••••••">
